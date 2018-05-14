@@ -4,7 +4,7 @@
 //
 
 #include <Arduino.h>
-#include <Controleo3.h> // Hardware-specific library
+#include "Controleo3.h" // Hardware-specific library
 #include "ReflowWizard.h"
 
 // Global temporary buffers (used everywhere)
