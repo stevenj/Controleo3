@@ -23,6 +23,27 @@ In this folder are:
 To install the Controleo3 library, please refer to:  
 http://arduino.cc/en/Guide/Libraries or http://www.whizoo.com/update
 
+Hardware Specification
+======================
+
+## Onboard Flash: W25Q80BV
+The W25Q80BV(8M-bit) Serial Flash is organized into 4,096 programmable pages of 256-bytes each.  The W25Q80BV supports the standard Serial  Peripheral Interface (SPI), and a high performance Dual/Quad output as well as Dual/Quad I/O SPI.
+
+### Pin Assignment
+| SAMD21 IO     | FUNCTION    | Note |
+| ------------- |-------------|------|
+| PA13          | CLK         | SERCOM2/4[1] |
+| PA14          | CS          | SERCOM2/4[2] |
+| PA16          | MOSI        | SERCOM1/3[0] |
+| PA17          | MISO        | SERCOM1/3[1] |
+| PA18          | WP          | SERCOM1/3[3] |
+| PA19          | HOLD        | SERCOM1/3[4] |
+
+### Notes
+  Due to the pin assignment it is impossible to use a SERCOM to read/write the external flash and it must be bit bashed.  Quad SPI is available, which might improve performance for bit bashing.
+
+  The current driver uses QSPI mode for this chip uses 4 bit mode for reading/writing.
+
 Reflow Wizard
 =============
 * 1.0  Initial public release. (21 August 2017)  
