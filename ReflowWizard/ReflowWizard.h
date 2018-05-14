@@ -2,6 +2,8 @@
 // Released under CC BY-NC-SA 3.0 license
 // Build a reflow oven: http://whizoo.com
 //
+#ifndef __REFLOWWIZARD_H__
+#define __REFLOWWIZARD_H__
 
 #define CONTROLEO3_VERSION             "v1.4"
 
@@ -277,3 +279,4 @@ struct Controleo3Prefs {
   uint8_t   spare[100];                       // Spare bytes that are initialized to zero.  Aids future expansion
 } prefs;
 
+#endif
