@@ -5,6 +5,8 @@
 #ifndef __REFLOWWIZARD_H__
 #define __REFLOWWIZARD_H__
 
+#include <stdint.h>
+
 #define CONTROLEO3_VERSION             "v1.4"
 
 
