@@ -450,7 +450,7 @@ File SDClass::open(const char *filepath, uint8_t mode) {
 
   int pathidx;
 
-  // do the interative search
+  // do the interactive search
   SdFile parentdir = getParentDir(filepath, &pathidx);
   // no more subdirs!
 
