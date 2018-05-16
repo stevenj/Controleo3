@@ -10,21 +10,43 @@ http://www.whizoo.com/buy
 Updating the firmware running on Controleo3:  
 http://www.whizoo.com/update
 
-### This is the GitHub source code repository for Controleo3.
+### This is the GitHub source code repository for Controleo3, as modified by Steven Johnson.
 
-This software has been released under the CC BY-NC-SA 3.0 license.  You are free
-To use it any way you wish.
+This software has been released under the GPL V3 license.  
 
 In this folder are:
-1. README - this file
-2. Files that comprise the Controleo3 library for Arduino
-3. An "examples” folder containing the Reflow Wizard software
+1. README.md - this file
+2. LICENSE - The Software License
+3. A "ReflowWizard” folder containing the Reflow Wizard software
 
-To install the Controleo3 library, please refer to:  
-http://arduino.cc/en/Guide/Libraries or http://www.whizoo.com/update
+Building
+========
+
+This software is stand alone and requires no libraries.  Just set Arduino IDE up for **Arduino/Genuino Zero (Native USB Port)** and build (verify) ReflowWizard.ino
+
 
 Hardware Specification
 ======================
+
+## GP Outputs:
+Outputs 1 through 5 Control n-channel MOSFETs, which switch 4.5V (5V less schottky diode) at up to 240mA.  Terminated on Screw Terminals, active low with a common positive line.
+
+### Pin Assignment
+| SAMD21 IO     | FUNCTION    | Note |
+| ------------- |-------------|------|
+| PA15          | OUTPUT 1    | Arduino = D5 |
+| PB30          | OUTPUT 2    | Not mapped in Arduino |
+| PB17          | OUTPUT 3    | Not mapped in Arduino |
+| PB09          | OUTPUT 4    | Arduino = A2 |
+| PB08          | OUTPUT 5    | Arduino = A1 |
+
+## GP IO
+There is a single GPIO, directly connected to the processor.  It is on a PAD on the PCB.  Can be used as a Digital Input or Output.
+
+### Pin Assignment
+| SAMD21 IO     | FUNCTION    | Note |
+| ------------- |-------------|------|
+| PB11          | OUTPUT 6    | Arduino = SCK |
 
 ## Onboard Flash: W25Q80BV
 The W25Q80BV(8M-bit) Serial Flash is organized into 4,096 programmable pages of 256-bytes each.  The W25Q80BV supports the standard Serial  Peripheral Interface (SPI), and a high performance Dual/Quad output as well as Dual/Quad I/O SPI.
