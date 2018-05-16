@@ -4,10 +4,11 @@
 //
 
 // Preferences are stored in 4K blocks.  There are 4 blocks, and they are rotated for each write to
-// maximixe redundancy and minimize write wear.  Blocks have a 32-bit sequence number as the first
+// maximize redundancy and minimize write wear.  Blocks have a 32-bit sequence number as the first
 // 4 bytes.  This number is increased after each write to be able to identify the latest prefs.
-// Blocks are initialized to 0xFF's after erase, so prefrences should be added with this in mind.
-
+// Blocks are initialized to 0xFF after erase, so preferences should be added with this in mind.
+#include "Prefs.h"
+#include "ReflowWizard.h"
 
 #define NO_OF_PREFS_BLOCKS          4
 #define PAGES_PER_PREFS_BLOCK       16
