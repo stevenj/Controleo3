@@ -6,7 +6,7 @@
 // Outputs 1 through 5
 //  - Go to the screw terminals
 //  - Control n-channel MOSFETs, which switch 4.5V (5V less schottky diode)
-//  - MOSFET's can handle currents up to 240mA
+//  - MOSFETs can handle currents up to 240mA
 //  - Protected by 240 Ohm resistors, so current is limited to 19mA per output
 //  - Output 1 = PA15 (Arduino = D5)
 //  - Output 2 = PB30 (Arduino = not available)
@@ -21,7 +21,7 @@
 //  - Output 6 = PB11 (Arduino = SCK)
 //
 //  On the board (and in the build guide) the outputs are 1 through 6. In software they are 0 through 5.
-
+#include "Outputs.h"
 
 volatile uint32_t *portAOut, *portAMode, *portBOut, *portBMode;
 static boolean outputState[NUMBER_OF_OUTPUTS];
