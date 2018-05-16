@@ -8,6 +8,7 @@
 #include "ReflowWizard.h"
 #include "Outputs.h"
 #include "Servo.h"
+#include "Prefs.h"
 
 // Global temporary buffers (used everywhere)
 char buffer100Bytes[100];
