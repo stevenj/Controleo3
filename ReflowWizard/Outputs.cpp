@@ -22,6 +22,8 @@
 //
 //  On the board (and in the build guide) the outputs are 1 through 6. In software they are 0 through 5.
 #include "Outputs.h"
+#include "bits.h"
+#include "ReflowWizard.h"
 
 volatile uint32_t *portAOut, *portAMode, *portBOut, *portBMode;
 static boolean outputState[NUMBER_OF_OUTPUTS];
