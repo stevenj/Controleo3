@@ -6,6 +6,8 @@
 #include <Arduino.h>
 #include "Controleo3.h" // Hardware-specific library
 #include "ReflowWizard.h"
+#include "Outputs.h"
+#include "Servo.h"
 
 // Global temporary buffers (used everywhere)
 char buffer100Bytes[100];
