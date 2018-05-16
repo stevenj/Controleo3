@@ -28,6 +28,7 @@ This software is stand alone and requires no libraries.  Just set Arduino IDE up
 ## HARDWARE SPECIFICATION
 
 ### Processor
+
 The processor is an Atmel/Microchip [ATSAMD21G18](http://www.microchip.com/wwwproducts/en/ATsamd21g18)
 
 ### GP Outputs
@@ -53,6 +54,16 @@ There is a single GPIO, directly connected to the processor.  It is on a PAD on 
 | SAMD21 IO     | FUNCTION      | Note          |
 | ------------- | ------------- | ------------- |
 | PB11          | OUTPUT 6      | Arduino = SCK |
+
+### Servo Output
+
+A Servo output is available.  Servo Control uses Timer Counter 3 for Timing control.  A 1-2ms pulse every 20ms.
+
+#### SERVO - Pin Assignment
+
+| SAMD21 IO     | FUNCTION      | Note          |
+| ------------- | ------------- | ------------- |
+| PB31          | SERVO OUTPUT  | Uses Timer Counter 3 (TC3) |
 
 ### Onboard Flash: W25Q80BV
 
