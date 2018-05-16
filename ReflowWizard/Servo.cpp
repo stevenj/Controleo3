@@ -28,7 +28,7 @@
 //
 // Plan B:
 // =======
-// The above scheme souunds great, but CC1 was delayed by up to 1ms every now & then.  This resulted in very erratic 
+// The above scheme sounds great, but CC1 was delayed by up to 1ms every now & then.  This resulted in very erratic 
 // servo behavior.  The work-around now is to wait inside the ISR for the duration of the servo pulse.  This is
 // an awful thing to do; ISR's should always do the absolute minimum and then return.  However, servo movement
 // is important and the delay is 2ms at most.  Nothing should be affected by this delay.  The touchscreen has
@@ -37,10 +37,12 @@
 // With a 48MHz clock, the prescaler is set to 64.  This gives a timer speed of 48,000,000 / 64 = 750,000. This means
 // the timer counts from 0 to 750,000 in one second.  We'd like the interrupt to fire 50 times per second so we set
 // the compare register CC[0].reg to 750,000 / 50 = 15,000.
+#include "Servo.h"
+#include "Outputs.h"
+#include "bits.h"
 
-
-#define MIN_PULSE_WIDTH        800     // The shortest pulse (nanoseconds) sent to a servo (Arduino's servo library has 544)
-#define MAX_PULSE_WIDTH        2200    // The longest pulse (nanoseconds) sent to a servo (Arduino's servo library has 2400)
+#define MIN_PULSE_WIDTH        800     // The shortest pulse (nanoseconds) sent to a servo (The Arduino servo library has 544)
+#define MAX_PULSE_WIDTH        2200    // The longest pulse (nanoseconds) sent to a servo (The Arduino servo library has 2400)
 
 // 15,000 counter => 20ms (20,000 ns).  So converting pulse to a counter value ...
 #define MIN_PULSE_COUNTER      ((MIN_PULSE_WIDTH * 3) / 4)   // 600
