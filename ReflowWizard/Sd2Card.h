@@ -13,19 +13,19 @@
 #include "bits.h"
 
 
-// SCK is PA13
+// SCK is PA5
 #define CLK_ACTIVE      (*portAOut |= SETBIT05)
 #define CLK_IDLE     	(*portAOut &= CLEARBIT05)
 
-// CS is PA14 (D2)
+// CS is PA7
 #define CS_IDLE         (*portAOut |= SETBIT07)
 #define CS_ACTIVE       (*portAOut &= CLEARBIT07)
 
-// MOSI is PA16 (D11)
+// MOSI is PA6
 #define MOSI_ACTIVE     (*portAOut |= SETBIT06)
 #define MOSI_IDLE     	(*portAOut &= CLEARBIT06)
 
-// MISO is PA17 (D13)
+// MISO is PA4
 #define MISO_ACTIVE     (*portAOut |= SETBIT04)
 #define MISO_IDLE		(*portAOut &= CLEARBIT04)
 #define MISO_HIGH  		(*portAIn & SETBIT04)
