@@ -38,8 +38,10 @@
 // the timer counts from 0 to 750,000 in one second.  We'd like the interrupt to fire 50 times per second so we set
 // the compare register CC[0].reg to 750,000 / 50 = 15,000.
 #include "Servo.h"
+#include "ReflowWizard.h"
 #include "Outputs.h"
 #include "bits.h"
+#include "Prefs.h"
 
 #define MIN_PULSE_WIDTH        800     // The shortest pulse (nanoseconds) sent to a servo (The Arduino servo library has 544)
 #define MAX_PULSE_WIDTH        2200    // The longest pulse (nanoseconds) sent to a servo (The Arduino servo library has 2400)
