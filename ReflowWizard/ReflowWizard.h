@@ -6,6 +6,7 @@
 #define __REFLOWWIZARD_H__
 
 #include <stdint.h>
+#include "Controleo3Flash.h"
 
 #define CONTROLEO3_VERSION             "v1.4"
 
@@ -280,5 +281,9 @@ struct Controleo3Prefs {
 
   uint8_t   spare[100];                       // Spare bytes that are initialized to zero.  Aids future expansion
 } prefs;
+
+// GLOBALS
+extern char buffer100Bytes[100];
+extern Controleo3Flash  flash;                // Global Object. Sigh.
 
 #endif
