@@ -42,6 +42,7 @@
 #include "Outputs.h"
 #include "bits.h"
 #include "Prefs.h"
+#include "Temperature.h"
 
 #define MIN_PULSE_WIDTH        800     // The shortest pulse (nanoseconds) sent to a servo (The Arduino servo library has 544)
 #define MAX_PULSE_WIDTH        2200    // The longest pulse (nanoseconds) sent to a servo (The Arduino servo library has 2400)

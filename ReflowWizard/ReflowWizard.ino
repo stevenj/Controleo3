@@ -9,6 +9,7 @@
 #include "Outputs.h"
 #include "Servo.h"
 #include "Prefs.h"
+#include "Temperature.h"
 
 // Global temporary buffers (used everywhere)
 char buffer100Bytes[100];
