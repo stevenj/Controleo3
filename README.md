@@ -65,6 +65,24 @@ A Servo output is available.  Servo Control uses Timer Counter 3 for Timing cont
 | ------------- | ------------- | ------------- |
 | PB31          | SERVO OUTPUT  | Uses Timer Counter 3 (TC3) |
 
+
+### Thermocouple: MAX31856
+
+A [MAX31856](http://datasheets.maximintegrated.com/en/ds/MAX31856.pdf) thermocouple is used to read oven temperature.
+
+#### Thermocouple - Pin Assignment
+
+| SAMD21 IO     | Arduino IO | FUNCTION      | Note         |
+| ------------- | ------------- | ------------ | ------------- |
+| PA20          | 6 | MISO           | SERCOM5/3[2] |
+| PA21          | 7 | MOSI           | SERCOM5/3[3] |
+| PA22          | 20 | CLK          | SERCOM3/5[0] |
+| PA23          | 21 | CS          | SERCOM3/5[1] |
+
+#### Thermocouple - Notes
+
+The MAX31856 is an SPI device, AND it is connected to the SERCOM 5/3 which can implement hardware SPI.  BUT Because it as been inexplicably wired up in such a way as to prevent the use of hardware SPI, it MUST BE BIT BASHED.  This is totally unnecessary and a waste of hardware resources.  **BAD HARDWARE DESIGN that must be corrected with software.**
+
 ### Onboard Flash: W25Q80BV
 
 The W25Q80BV(8M-bit) Serial Flash is organized into 4,096 programmable pages of 256-bytes each.  The W25Q80BV supports the standard Serial  Peripheral Interface (SPI), and a high performance Dual/Quad output as well as Dual/Quad I/O SPI.
