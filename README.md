@@ -35,27 +35,18 @@ Maximum SERCOM SPI Rate of the ATSAMD21 is 12Mhz.
 
 ### GP Outputs
 
-Outputs 1 through 5 Control n-channel MOSFETs, which switch 4.5V (5V less schottky diode) at up to 240mA.  Terminated on Screw Terminals, active low with a common positive line.
+Outputs 1 through 5 Control n-channel MOSFETs, which switch 4.5V (5V less schottky diode) at up to 240mA.  Terminated on Screw Terminals, active low with a common positive line.  Output 6 is a RAW output on the board, and could also be used as an input.
 
 #### GPO - Pin Assignment
 
-| SAMD21 IO     | FUNCTION      | Note                  |
-| ------------- | ------------- | --------------------- |
-| PA15          | OUTPUT 1      | Arduino = D5          |
-| PB30          | OUTPUT 2      | Not mapped in Arduino |
-| PB17          | OUTPUT 3      | Not mapped in Arduino |
-| PB09          | OUTPUT 4      | Arduino = A2          |
-| PB08          | OUTPUT 5      | Arduino = A1          |
-
-### GP IO
-
-There is a single GPIO, directly connected to the processor.  It is on a PAD on the PCB.  Can be used as a Digital Input or Output.
-
-#### GPIO - Pin Assignment
-
-| SAMD21 IO     | FUNCTION      | Note          |
-| ------------- | ------------- | ------------- |
-| PB11          | OUTPUT 6      | Arduino = SCK |
+| SAMD21 IO     | Arduino IO |FUNCTION      | Note                  |
+| ------------- | --| ------------- | --------------------- |
+| PA15          | 5 | OUTPUT 1      | Low Side Switch       |
+| PB30          | Not Mapped | OUTPUT 2  | Low Side Switch |
+| PB17          | Not Mapped | OUTPUT 3  | Low Side Switch |
+| PB09          | A2 | OUTPUT 4          | Low Side Switch |
+| PB08          | A1 | OUTPUT 5          | Low Side Switch |
+| PB11          | SCK | OUTPUT 6         | RAW GPIO        |
 
 ### Servo Output
 
@@ -63,8 +54,8 @@ A Servo output is available.  Servo Control uses Timer Counter 3 for Timing cont
 
 #### SERVO - Pin Assignment
 
-| SAMD21 IO     | FUNCTION      | Note          |
-| ------------- | ------------- | ------------- |
+| SAMD21 IO     | FUNCTION      | Note                       |
+| ------------- | ------------- | -------------------------- |
 | PB31          | SERVO OUTPUT  | Uses Timer Counter 3 (TC3) |
 
 ### Thermocouple: MAX31856
@@ -73,12 +64,12 @@ A [MAX31856](http://datasheets.maximintegrated.com/en/ds/MAX31856.pdf) thermocou
 
 #### Thermocouple - Pin Assignment
 
-| SAMD21 IO     | Arduino IO | FUNCTION      | Note         |
+| SAMD21 IO     | Arduino IO    | FUNCTION     | Note          |
 | ------------- | ------------- | ------------ | ------------- |
-| PA20          | 6 | MISO           | SERCOM5/3[2] |
-| PA21          | 7 | MOSI           | SERCOM5/3[3] |
-| PA22          | 20 | CLK          | SERCOM3/5[0] |
-| PA23          | 21 | CS          | SERCOM3/5[1] |
+| PA20          | 6             | MISO         | SERCOM5/3[2]  |
+| PA21          | 7             | MOSI         | SERCOM5/3[3]  |
+| PA22          | 20            | CLK          | SERCOM3/5[0]  |
+| PA23          | 21            | CS           | SERCOM3/5[1]  |
 
 #### Thermocouple - Notes
 
@@ -90,12 +81,13 @@ An SD Card interface is available, and is using the SDCard in SPI Mode.
 
 #### SDCard - Pin Assignment
 
-| SAMD21 IO     | FUNCTION      | Note         |
-| ------------- | ------------ | ------------- |
-| PA4          |  MISO           | SERCOM0[0] - SERCOM DI (DIPO 0x0) |
-| PA5          |  CLK           | SERCOM0[1] - SERCOM CLK (DOPO 0x0/0x2) |
-| PA6          |  MOSI          | SERCOM0[2] - SERCOM DO  (DOPO 0x1) |
-| PA7          |  CS          | SERCOM0[3] - CS Software Controlled|
+| SAMD21 IO     | FUNCTION     | Note                                   |
+| ------------- | ------------ | -------------------------------------- |
+| PA0           | CD           | SD Card Detect                         |
+| PA4           | MISO         | SERCOM0[0] - SERCOM DI (DIPO 0x0)      |
+| PA5           | CLK          | SERCOM0[1] - SERCOM CLK (DOPO 0x0/0x2) |
+| PA6           | MOSI         | SERCOM0[2] - SERCOM DO  (DOPO 0x1)     |
+| PA7           | CS           | SERCOM0[3] - CS Software Controlled    |
 
 #### SDCard - Notes
 
@@ -111,14 +103,14 @@ The board has a 480x320 LCD driven by a [ILI9488](https://www.buydisplay.com/dow
 
 #### LCD - Pin Assignment
 
-| SAMD21 IO | FUNCTION     | Note         |
-| ----------| ------------ | ------------- |
-| PB0-PB7   |  D0-D7       | 8 Bit Parallel LCD Data  |
-| PB12      |  RD          | LCD READ Strobe |
-| PB13      |  WR          | LCD WRITE Strobe  |
-| PB14      |  D/CX        | LCD Data/Command Address |
-| PB15      |  CS          | LCD Chip Select |
-| PB16      |  RESET       | LCD Reset |
+| SAMD21 IO  | FUNCTION     | Note                     |
+| ---------- | ------------ | ------------------------ |
+| PB0-PB7    | D0-D7        | 8 Bit Parallel LCD Data  |
+| PB12       | RD           | LCD READ Strobe          |
+| PB13       | WR           | LCD WRITE Strobe         |
+| PB14       | D/CX         | LCD Data/Command Address |
+| PB15       | CS           | LCD Chip Select          |
+| PB16       | RESET        | LCD Reset                |
 
 #### LCD - Notes
 
@@ -130,13 +122,13 @@ A SPI LCD Touchscreen controller is connected.  The controller is a [XPT2046](ht
 
 #### LCD Touchscreen - Pin Assignment
 
-| SAMD21 IO | FUNCTION     | Note         |
-| ----------| ------------ | ------------- |
-| PA8       |  CLK         | SERCOM0/2[0]  |
-| PA9       |  CS          | SERCOM0/2[1]  |
-| PA10      |  MOSI        | SERCOM0/2[2]  |
-| PA11      |  MISO        | SERCOM0/2[3]  |
-| PB10      |  IRQ         | |
+| SAMD21 IO  | FUNCTION     | Note          |
+| ---------- | ------------ | ------------- |
+| PA8        | CLK          | SERCOM0/2[0]  |
+| PA9        | CS           | SERCOM0/2[1]  |
+| PA10       | MOSI         | SERCOM0/2[2]  |
+| PA11       | MISO         | SERCOM0/2[3]  |
+| PB10       | IRQ          |               |
 
 #### LCD Touchscreen - Notes
 
@@ -159,9 +151,19 @@ The W25Q80BV(8M-bit) Serial Flash is organized into 4,096 programmable pages of 
 
 #### FLASH - Notes
 
-  Due to the pin assignment it is impossible to use a SERCOM to read/write the external flash and it must be bit bashed.  Quad SPI is available, which might improve performance for bit bashing.
+  Due to the pin assignment it is impossible to use a SERCOM to read/write the external flash and it must be bit bashed.  Quad SPI is available, which might improve performance for bit bashing.  To equal the SPI Hardware Rate of 12Mhz, the Bit bash routine needs to read a 4 bit qty every 16 CPU Clock Cycles (Sustained).
 
   The current driver uses QSPI mode for this chip uses 4 bit mode for reading/writing.
+
+### Piezo Buzzer
+
+A Piezo Buzzer is on board.
+
+#### Piezo Buzzer - Pin Assignment
+
+| SAMD21 IO     | FUNCTION              | Note                |
+| ------------- | --------------------- | ------------------- |
+| PA12          | TCC2/WO[0] TCC0/WO[6] | Piezo Buzzer Output |
 
 ## Reflow Wizard - Version Log
 
@@ -182,5 +184,5 @@ The W25Q80BV(8M-bit) Serial Flash is organized into 4,096 programmable pages of 
   * When switching between non-FAT and FAT16/FAT32 formatted cards, a reboot was needed.  This has been fixed.
   * Added comments and fixed spelling mistakes in the source code
 
-Peter Easton 2017
-whizoo.com
+Peter Easton 2017 (V1.0 to 1.4) whizoo.com
+Steven Johnson 2018 (S1.5+)
