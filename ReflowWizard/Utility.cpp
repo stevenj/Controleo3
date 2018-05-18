@@ -2,7 +2,10 @@
 // Released under CC BY-NC-SA 3.0 license
 // Build a reflow oven: http://whizoo.com
 //
-
+#include <Arduino.h>
+#include "Utility.h"
+#include "ReflowWizard.h"
+#include "Outputs.h"
 
 // Convert the duration into a readable string
 void secondsToEnglishString(char *str, uint32_t seconds)
