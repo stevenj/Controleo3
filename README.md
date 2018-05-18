@@ -86,7 +86,7 @@ The MAX31856 is an SPI device, AND it is connected to the SERCOM 5/3 which can i
 
 ### SDCard Interface
 
-An SD Card interface is available, and is using the sdcard in SPI Mode.
+An SD Card interface is available, and is using the SDCard in SPI Mode.
 
 #### SDCard - Pin Assignment
 
@@ -105,7 +105,8 @@ It MAY be possible to use hardware SPI for READ ONLY, but for any Write or full 
 
 Note, the software also contains a comment seemingly bragging about a low low speed of 1.25Mhz bit bashed as some sort of accomplishment.  It is very strange.
 
-### LCD 
+### LCD
+
 The board has a 480x320 LCD driven by a [ILI9488](https://www.buydisplay.com/download/ic/ILI9488.pdf) LCD Controller.
 
 #### LCD - Pin Assignment
@@ -120,9 +121,11 @@ The board has a 480x320 LCD driven by a [ILI9488](https://www.buydisplay.com/dow
 | PB16      |  RESET       | LCD Reset |
 
 #### LCD - Notes
+
 The LCD is capable of 18 bit mode, but 16 bit mode is used for performance reasons.  The hardware has no parallel bus support so the LCD Bus is done manually.
 
 ### LCD Touchscreen
+
 A SPI LCD Touchscreen controller is connected.  The controller is a [XPT2046](https://www.buydisplay.com/download/ic/XPT2046.pdf)
 
 #### LCD Touchscreen - Pin Assignment
@@ -138,7 +141,6 @@ A SPI LCD Touchscreen controller is connected.  The controller is a [XPT2046](ht
 #### LCD Touchscreen - Notes
 
 The LCD Touchscreen is an SPI Device.  It is connected to the pins of a SERCOM which provides hardware SPI.  HOWEVER, because of a ridiculous pin assignment HARDWARE SPI can not be utilized and this device **MUST BE BIT BASHED.**  The CLK Line is on PAD0, which is not an available CLK Pin.
-
 
 ### Onboard Flash: W25Q80BV
 
