@@ -39,14 +39,14 @@ Outputs 1 through 5 Control n-channel MOSFETs, which switch 4.5V (5V less schott
 
 #### GPO - Pin Assignment
 
-| SAMD21 IO     | Arduino IO |FUNCTION      | Note                  |
-| ------------- | --| ------------- | --------------------- |
-| PA15          | 5 | OUTPUT 1      | Low Side Switch       |
-| PB30          | Not Mapped | OUTPUT 2  | Low Side Switch |
-| PB17          | Not Mapped | OUTPUT 3  | Low Side Switch |
-| PB09          | A2 | OUTPUT 4          | Low Side Switch |
-| PB08          | A1 | OUTPUT 5          | Low Side Switch |
-| PB11          | SCK | OUTPUT 6         | RAW GPIO        |
+| SAMD21 IO     | Arduino IO  | FUNCTION      | Note                  |
+| ------------- | ----------- | ------------- | --------------------- |
+| PA15          | 5           | OUTPUT 1      | Low Side Switch       |
+| PB30          | Not Mapped  | OUTPUT 2      | Low Side Switch       |
+| PB17          | Not Mapped  | OUTPUT 3      | Low Side Switch       |
+| PB09          | A2          | OUTPUT 4      | Low Side Switch       |
+| PB08          | A1          | OUTPUT 5      | Low Side Switch       |
+| PB11          | SCK         | OUTPUT 6      | RAW GPIO              |
 
 ### Servo Output
 
