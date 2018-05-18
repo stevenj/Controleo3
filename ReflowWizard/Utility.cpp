@@ -6,6 +6,7 @@
 #include "Utility.h"
 #include "ReflowWizard.h"
 #include "Outputs.h"
+#include "Render.h"
 
 // Convert the duration into a readable string
 void secondsToEnglishString(char *str, uint32_t seconds)
