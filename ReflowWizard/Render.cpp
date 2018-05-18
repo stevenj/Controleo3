@@ -4,7 +4,10 @@
 //
 // Some fonts are fixed width.  This is so that when updating a field (like temperature), you can just overwrite
 // the previous number instead of erasing the number and then redrawing it.
-
+#include <Arduino.h>
+#include "Render.h"
+#include "Bitmaps.h"
+#include "ReflowWizard.h"
 
 // Render a bitmap to the screen
 // All the bitmaps exist in external flash, but some are duplicated in microcontroller flash.

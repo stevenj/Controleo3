@@ -20,6 +20,8 @@
 // If you want to add a bitmap, create the bitmap array (e.g. bmp259) and add it to
 // flashBitmaps array at the bottom of this file.  Then add a define just before 
 // "#define BITMAP_LAST_ONE" in ReflowWizard.h file.
+#include <Arduino.h>
+#include "Bitmaps.h"
 
 const uint16_t bmp7[169] PROGMEM = // Bitmap 7
 {
