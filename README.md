@@ -103,6 +103,24 @@ It MAY be possible to use hardware SPI for READ ONLY, but for any Write or full 
 
 Note, the software also contains a comment seemingly bragging about a low low speed of 1.25Mhz bit bashed as some sort of accomplishment.  It is very strange.
 
+### LCD Touchscreen
+A SPI LCD Touchscreen controller is connected.  The controller is a [XPT2046](https://www.buydisplay.com/download/ic/XPT2046.pdf)
+
+#### LCD Touchscreen - Pin Assignment
+
+| SAMD21 IO | FUNCTION     | Note         |
+| ----------| ------------ | ------------- |
+| PA8       |  CLK         | SERCOM0/2[0]  |
+| PA9       |  CS          | SERCOM0/2[1]  |
+| PA10      |  MOSI        | SERCOM0/2[2]  |
+| PA11      |  MISO        | SERCOM0/2[3]  |
+| PB10      |  IRQ         | |
+
+#### LCD Touchscreen - Notes
+
+The LCD Touchscreen is an SPI Device.  It is connected to the pins of a SERCOM which provides hardware SPI.  HOWEVER, because of a ridiculous pin assignment HARDWARE SPI can not be utilized and this device **MUST BE BIT BASHED.**  The CLK Line is on PAD0, which is not an available CLK Pin.
+
+
 ### Onboard Flash: W25Q80BV
 
 The W25Q80BV(8M-bit) Serial Flash is organized into 4,096 programmable pages of 256-bytes each.  The W25Q80BV supports the standard Serial  Peripheral Interface (SPI), and a high performance Dual/Quad output as well as Dual/Quad I/O SPI.
