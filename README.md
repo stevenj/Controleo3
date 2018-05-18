@@ -31,6 +31,8 @@ This software is stand alone and requires no libraries.  Just set Arduino IDE up
 
 The processor is an Atmel/Microchip [ATSAMD21G18](http://www.microchip.com/wwwproducts/en/ATsamd21g18)
 
+Maximum SERCOM SPI Rate of the ATSAMD21 is 12Mhz.
+
 ### GP Outputs
 
 Outputs 1 through 5 Control n-channel MOSFETs, which switch 4.5V (5V less schottky diode) at up to 240mA.  Terminated on Screw Terminals, active low with a common positive line.
@@ -102,6 +104,23 @@ The SDCard is an SPI device, AND it is connected to the SERCOM 0 which can imple
 It MAY be possible to use hardware SPI for READ ONLY, but for any Write or full duplex operation the SPI must be bit bashed.
 
 Note, the software also contains a comment seemingly bragging about a low low speed of 1.25Mhz bit bashed as some sort of accomplishment.  It is very strange.
+
+### LCD 
+The board has a 480x320 LCD driven by a [ILI9488](https://www.buydisplay.com/download/ic/ILI9488.pdf) LCD Controller.
+
+#### LCD - Pin Assignment
+
+| SAMD21 IO | FUNCTION     | Note         |
+| ----------| ------------ | ------------- |
+| PB0-PB7   |  D0-D7       | 8 Bit Parallel LCD Data  |
+| PB12      |  RD          | LCD READ Strobe |
+| PB13      |  WR          | LCD WRITE Strobe  |
+| PB14      |  D/CX        | LCD Data/Command Address |
+| PB15      |  CS          | LCD Chip Select |
+| PB16      |  RESET       | LCD Reset |
+
+#### LCD - Notes
+The LCD is capable of 18 bit mode, but 16 bit mode is used for performance reasons.  The hardware has no parallel bus support so the LCD Bus is done manually.
 
 ### LCD Touchscreen
 A SPI LCD Touchscreen controller is connected.  The controller is a [XPT2046](https://www.buydisplay.com/download/ic/XPT2046.pdf)
