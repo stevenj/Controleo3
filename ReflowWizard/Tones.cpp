@@ -2,6 +2,9 @@
 // Released under CC BY-NC-SA 3.0 license
 // Build a reflow oven: http://whizoo.com
 //
+#include <Arduino.h>
+#include "ReflowWizard.h"
+#include "Controleo3.h"
 
 // Frequency of the various notes
 

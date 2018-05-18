@@ -11,6 +11,7 @@
 #include "Prefs.h"
 #include "Temperature.h"
 #include "Render.h"
+#include "Tones.h"
 
 // Global temporary buffers (used everywhere)
 char buffer100Bytes[100];
