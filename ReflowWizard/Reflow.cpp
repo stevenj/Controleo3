@@ -2,7 +2,21 @@
 // Released under CC BY-NC-SA 3.0 license
 // Build a reflow oven: http://whizoo.com
 //
+#include "Reflow.h"
 #include "ReadProfiles.h"
+#include "ReflowWizard.h"
+#include "Render.h"
+#include "Utility.h"
+#include "Touch.h"
+#include "Outputs.h"
+#include "Screens.h"
+#include "Servo.h"
+#include "Prefs.h"
+#include "Tones.h"
+#include "Controleo3MAX31856.h"
+#include "Temperature.h"
+#include "Bake.h"
+#include "Help.h"
 
 // Perform a reflow
 // Stay in this function until the bake is done or canceled
