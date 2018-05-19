@@ -56,9 +56,10 @@ A Servo output is available.  Servo Control uses Timer Counter 3 for Timing cont
 
 | SAMD21 IO     | FUNCTION      | Note                       |
 | ------------- | ------------- | -------------------------- |
-| PB31          | SERVO OUTPUT  | TCC0/WO[0] TCC1/WO[3] |
+| PB31          | SERVO OUTPUT  | TCC0/WO[0] TCC1/WO[3]      |
 
 #### SERVO - Notes
+
 The current driver uses Timer Counter 3 (TC3) even though the output is
 connected to TCC0 and TCC1.  Using either TCC0 or TCC1 gives a hardware PWM output more than adequate for producing a 1-2ms pulse in a 20ms period as required by the Servo.  The current driver is done all with software and interrupts.  Using the hardware resources will give Servo Control with no CPU overhead.
 
@@ -169,6 +170,28 @@ A Piezo Buzzer is on board.
 | ------------- | --------------------- | ------------------- |
 | PA12          | TCC2/WO[0] TCC0/WO[6] | Piezo Buzzer Output |
 
+### USB
+
+USB is on board and is being used to create a virtual serial port for dumping information to a connected PC.  I don't know if its Device only or OTG capable.
+
+#### USB - Pin Assignment
+
+| SAMD21 IO     | FUNCTION              | Note                |
+| ------------- | --------------------- | ------------------- |
+| PA24          | USB/DM                | USB Bus Line        |
+| PA25          | USB/DP                | USB Bus Line        |
+
+### Debugging
+
+SAMD21 exposes the standard ARM SWCLK/SWDIO and they can be used for programming the boot loader as well as debugging.
+
+#### Debugging - Pin Assignment
+
+| SAMD21 IO     | FUNCTION              | Note                |
+| ------------- | --------------------- | ------------------- |
+| PA30          | SWCLK                 | Serial Debug Clock  |
+| PA31          | SWDIO                 | Serial Debug IO     |
+
 ## Reflow Wizard - Version Log
 
 * 1.0  Initial public release. (21 August 2017)
@@ -189,4 +212,21 @@ A Piezo Buzzer is on board.
   * Added comments and fixed spelling mistakes in the source code
 
 Peter Easton 2017 (V1.0 to 1.4) whizoo.com
-Steven Johnson 2018 (S1.5+)
+
+This code has branched at V1.4 and likely will not track upstream.  Various refactors that I would like to do will make that increasingly difficult.
+
+* 1.5s Refactor and improvements
+  * This is a work in progress, as at 19 May 2018 it builds fine and runs on the hardware.  No functional changes have yet been introduced.
+  * Renamed all .ino files other than the primary one into .cpp and added headers.  Because multiple .ino is UGLY and ends up all catted together into one big mess.  This is a structural change only and introduced no changes in behavior or functionality.
+  * Planned changes (in no particular order):
+    * A mod to use 100% of the ovens heating power during heat up when the target temp is a long way away.
+    * Configurable max power settings for the 3 elements.
+    * Fix the Servo to use hardware instead of a ISR and bit toggling
+    * Try and make the SDCard reads faster using hardware SPI.
+    * Improved Temperature reading code.  Currently the code averages over a period of 3 Seconds, which doesn't (contrary to the comments in the code) make the readings more stable, what it actually does is introduce a large delay into the ability for the oven to detect changes in the temperature.  It is also doing temperature readings as part of the Servo Code, which is ugly.
+    * Use hand tuned assembler for all the unnecessary bit bashed spi this board needs, because the hardware design is broken and can not use any hardware SPI for pretty much anything (except maybe SDCard reading).
+    * Fix a lot of the ugly direct IO code to use Atmel ASF types, when i am not using hand tuned assembler.
+    * An ability to save the onboard flash contents to the SDCard.
+    * An ability to update the onboard flash contents from the SDCard.
+
+Steven Johnson 2018 (V1.5s+)
