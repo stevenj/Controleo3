@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include "Controleo3Flash.h"
 #include "Controleo3LCD.h"
+#include "Controleo3Touch.h"
 
 #define CONTROLEO3_VERSION             "S1.5"
 
@@ -275,5 +276,8 @@ extern char buffer100Bytes[100];
 
 extern Controleo3Flash  flash;                // Global Objects.
 extern Controleo3LCD    tft;
+extern Controleo3Touch  touch;
+
+void takeScreenshot(void);
 
 #endif

@@ -2,6 +2,14 @@
 // Released under CC BY-NC-SA 3.0 license
 // Build a reflow oven: http://whizoo.com
 //
+#include "Touch.h"
+#include "ReflowWizard.h"
+#include "Render.h"
+#include "Tones.h"
+#include "Screens.h"
+#include "Prefs.h"
+#include "Temperature.h"
+#include "Controleo3MAX31856.h"
 
 #define MAX_CALIBRATION_TIME  60000  // 60 seconds
 #define MAX_TAP_TARGETS    20
