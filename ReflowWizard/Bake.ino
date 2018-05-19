@@ -3,6 +3,7 @@
 // Build a reflow oven: http://whizoo.com
 //
 #include "Utility.h"
+#include "Help.h"
 
 // Stay in this function until the bake is done or canceled
 void bake() {

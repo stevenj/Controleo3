@@ -3,6 +3,10 @@
 // Build a reflow oven: http://whizoo.com
 //
 // Shows context-sensitive help for the various screens
+#include "Help.h"
+#include "ReflowWizard.h"
+#include "Touch.h"
+#include "Render.h"
 
 static uint16_t nextHelpLineY, nextHelpLineX;
 
