@@ -10,7 +10,7 @@
 #include "Controleo3LCD.h"
 #include "Controleo3Touch.h"
 
-#define CONTROLEO3_VERSION             "S1.5"
+#define CONTROLEO3_VERSION             "V1.5s"
 
 
 // Fonts
