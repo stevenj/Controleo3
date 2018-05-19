@@ -2,6 +2,20 @@
 // Released under CC BY-NC-SA 3.0 license
 // Build a reflow oven: http://whizoo.com
 //
+#include "Learn.h"
+#include "ReflowWizard.h"
+#include "Outputs.h"
+#include "Help.h"
+#include "Render.h"
+#include "Touch.h"
+#include "Prefs.h"
+#include "Bake.h"
+#include "Temperature.h"
+#include "Controleo3MAX31856.h"
+#include "Screens.h"
+#include "Utility.h"
+#include "Servo.h"
+#include "Tones.h"
 
 #define LEARNING_PHASE_INITIAL_RAMP         0
 #define LEARNING_PHASE_CONSTANT_TEMP        1
