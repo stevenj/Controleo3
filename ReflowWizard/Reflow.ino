@@ -2,6 +2,7 @@
 // Released under CC BY-NC-SA 3.0 license
 // Build a reflow oven: http://whizoo.com
 //
+#include "ReadProfiles.h"
 
 // Perform a reflow
 // Stay in this function until the bake is done or canceled

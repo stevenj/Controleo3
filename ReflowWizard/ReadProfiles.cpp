@@ -2,6 +2,12 @@
 // Released under CC BY-NC-SA 3.0 license
 // Build a reflow oven: http://whizoo.com
 //
+#include "ReadProfiles.h"
+#include "ReflowWizard.h"
+#include "Render.h"
+#include "Prefs.h"
+
+uint8_t flashBuffer256Bytes[256];     // Read/write from flash.  This is the size of a flash block
 
 // Read all the profiles from the SD card.  The profiles can be in sub-directories
 

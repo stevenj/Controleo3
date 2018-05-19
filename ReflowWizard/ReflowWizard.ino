@@ -17,7 +17,6 @@
 
 // Global temporary buffers (used everywhere)
 char buffer100Bytes[100];
-uint8_t flashBuffer256Bytes[256];     // Read/write from flash.  This is the size of a flash block
 
 Sd2Card card;
 SdVolume volume;
