@@ -56,7 +56,11 @@ A Servo output is available.  Servo Control uses Timer Counter 3 for Timing cont
 
 | SAMD21 IO     | FUNCTION      | Note                       |
 | ------------- | ------------- | -------------------------- |
-| PB31          | SERVO OUTPUT  | Uses Timer Counter 3 (TC3) |
+| PB31          | SERVO OUTPUT  | TCC0/WO[0] TCC1/WO[3] |
+
+#### SERVO - Notes
+The current driver uses Timer Counter 3 (TC3) even though the output is
+connected to TCC0 and TCC1.  Using either TCC0 or TCC1 gives a hardware PWM output more than adequate for producing a 1-2ms pulse in a 20ms period as required by the Servo.  The current driver is done all with software and interrupts.  Using the hardware resources will give Servo Control with no CPU overhead.
 
 ### Thermocouple: MAX31856
 
