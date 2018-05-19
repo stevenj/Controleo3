@@ -213,7 +213,7 @@ SAMD21 exposes the standard ARM SWCLK/SWDIO and they can be used for programming
 
 Peter Easton 2017 (V1.0 to 1.4) whizoo.com
 
-This code has branched at V1.4 and likely will not track upstream.  Various refactors that I would like to do will make that increasingly difficult.
+**This code has branched at V1.4 and likely will not track upstream.  Various refactors that I would like to do will make that increasingly difficult.**
 
 * 1.5s Refactor and improvements
   * This is a work in progress, as at 19 May 2018 it builds fine and runs on the hardware.  No functional changes have yet been introduced.
