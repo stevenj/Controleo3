@@ -279,5 +279,7 @@ extern Controleo3LCD    tft;
 extern Controleo3Touch  touch;
 
 void takeScreenshot(void);
+uint32_t getFreeRAM(void);
+void checkFreeMemory(void);
 
 #endif

@@ -2,7 +2,23 @@
 // Released under CC BY-NC-SA 3.0 license
 // Build a reflow oven: http://whizoo.com
 //
-
+#include "Screens.h"
+#include "ReflowWizard.h"
+#include "Touch.h"
+#include "Bitmaps.h"
+#include "Render.h"
+#include "Bake.h"
+#include "Help.h"
+#include "Utility.h"
+#include "Prefs.h"
+#include "Tones.h"
+#include "Reflow.h"
+#include "ReadProfiles.h"
+#include "Outputs.h"
+#include "Servo.h"
+#include "Controleo3MAX31856.h"
+#include "Temperature.h"
+#include "Learn.h"
 
 extern void setTouchCallback(void (*f) (), uint16_t interval);
 extern boolean drawTemperatureOnScreenNow;

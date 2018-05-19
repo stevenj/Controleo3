@@ -13,6 +13,7 @@
 #include "Render.h"
 #include "Tones.h"
 #include "Touch.h"
+#include "Screens.h"
 
 // Global temporary buffers (used everywhere)
 char buffer100Bytes[100];
