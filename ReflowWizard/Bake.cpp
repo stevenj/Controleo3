@@ -2,8 +2,19 @@
 // Released under CC BY-NC-SA 3.0 license
 // Build a reflow oven: http://whizoo.com
 //
+#include "Bake.h"
+#include "ReflowWizard.h"
 #include "Utility.h"
 #include "Help.h"
+#include "Render.h"
+#include "Screens.h"
+#include "Touch.h"
+#include "Outputs.h"
+#include "Servo.h"
+#include "Tones.h"
+#include "Prefs.h"
+#include "Controleo3MAX31856.h"
+#include "Temperature.h"
 
 // Stay in this function until the bake is done or canceled
 void bake() {
