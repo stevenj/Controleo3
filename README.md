@@ -29,7 +29,7 @@ This software is stand alone and requires no libraries.  Just set Arduino IDE up
 
 ### Processor
 
-The processor is an Atmel/Microchip [ATSAMD21G18](http://www.microchip.com/wwwproducts/en/ATsamd21g18)
+The processor is an Atmel/Microchip [ATSAMD21J18](http://www.microchip.com/wwwproducts/en/ATsamd21j18)
 
 Maximum SERCOM SPI Rate of the ATSAMD21 is 12Mhz.
 
