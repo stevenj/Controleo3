@@ -20,7 +20,7 @@ extern Controleo3MAX31856 thermocouple;
 // takeCurrentThermocoupleReading() is called from the Timer 1 interrupt (see "Servo" tab).  It is
 // called 5 times per second.
 
-#define NUM_READINGS           15  // Number of readings to average the temperature over (5 readings = 1 second)
+#define NUM_READINGS           1   // Number of readings to average the temperature over (5 readings = 1 second)
 #define ERROR_THRESHOLD        5   // Number of consecutive faults before a fault is returned
 
 volatile float MAX31856temperature;
