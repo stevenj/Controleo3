@@ -228,5 +228,6 @@ Peter Easton 2017 (V1.0 to 1.4) whizoo.com
     * Fix a lot of the ugly direct IO code to use Atmel ASF types, when i am not using hand tuned assembler.
     * An ability to save the onboard flash contents to the SDCard.
     * An ability to update the onboard flash contents from the SDCard.
+    * Would love to move the code off Arduino all together, and use a modern compiler, not a 4 yr old one.
 
 Steven Johnson 2018 (V1.5s+)
