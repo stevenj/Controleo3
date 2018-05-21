@@ -39,14 +39,14 @@ Outputs 1 through 5 Control n-channel MOSFETs, which switch 4.5V (5V less schott
 
 #### GPO - Pin Assignment
 
-| SAMD21 IO     | Arduino IO  | FUNCTION      | Note                  |
-| ------------- | ----------- | ------------- | --------------------- |
-| PA15          | 5           | OUTPUT 1      | Low Side Switch       |
-| PB30          | Not Mapped  | OUTPUT 2      | Low Side Switch       |
-| PB17          | Not Mapped  | OUTPUT 3      | Low Side Switch       |
-| PB09          | A2          | OUTPUT 4      | Low Side Switch       |
-| PB08          | A1          | OUTPUT 5      | Low Side Switch       |
-| PB11          | SCK         | OUTPUT 6      | RAW GPIO              |
+| SAMD21 IO     | Arduino IO  | FUNCTION      | Note                                                 |
+| ------------- | ----------- | ------------- | ---------------------------------------------------- |
+| PA15          | 5           | OUTPUT 1      | Low Side Switch                                      |
+| PB30          | Not Mapped  | OUTPUT 2      | Low Side Switch                                      |
+| PB17          | Not Mapped  | OUTPUT 3      | Low Side Switch                                      |
+| PB09          | A2          | OUTPUT 4      | Low Side Switch                                      |
+| PB08          | A1          | OUTPUT 5      | Low Side Switch                                      |
+| PB11          | SCK         | OUTPUT 6      | RAW GPIO - Used by this software a debug led signal. |
 
 ### Servo Output
 
@@ -88,7 +88,7 @@ An SD Card interface is available, and is using the SDCard in SPI Mode.
 
 | SAMD21 IO     | FUNCTION     | Note                                   |
 | ------------- | ------------ | -------------------------------------- |
-| PA0           | CD           | SD Card Detect                         |
+| PA2           | CD           | SD Card Detect                         |
 | PA4           | MISO         | SERCOM0[0] - SERCOM DI (DIPO 0x0)      |
 | PA5           | CLK          | SERCOM0[1] - SERCOM CLK (DOPO 0x0/0x2) |
 | PA6           | MOSI         | SERCOM0[2] - SERCOM DO  (DOPO 0x1)     |
@@ -191,6 +191,42 @@ SAMD21 exposes the standard ARM SWCLK/SWDIO and they can be used for programming
 | ------------- | --------------------- | ------------------- |
 | PA30          | SWCLK                 | Serial Debug Clock  |
 | PA31          | SWDIO                 | Serial Debug IO     |
+
+#### Debugging - Notes
+
+When not being used for Serial Wire Debugging, these IO can be used in this software to
+flash a connected LED.  For Debugging Purposes.
+
+### Internal Hardware Resource Allocation
+
+| SAMD21 HW          | ALLOCATION            | Note                                                      |
+| ------------------ | --------------------- | --------------------------------------------------------- |
+| NMI IRQ            |                       |                                                           |
+| SVC IRQ            | ????                  |                                                           |
+| SYSTICK            | System Timer          | ms Timer, used by Arduino and FreeRTOS for its scheduler. |
+| WATCHDOG           | ????                  |                                                           |  |
+| REALTIME CLOCK     | ????                  |                                                           |  |
+| EXTERNAL INTERRUPT | ????                  |                                                           |
+| USB                | Serial Comms          |                                                           |
+| SERCOM0            | UNUSED                | Maybe can be used for SD Card Reading                     |
+| SERCOM1            | UNUSED                | Can not be used, no connected hardware                    |
+| SERCOM2            | UNUSED                | Can not be used, no connected hardware                    |
+| SERCOM3            | UNUSED                | Can not be used, no connected hardware                    |
+| SERCOM4            | UNUSED                | Can not be used, no connected hardware                    |
+| SERCOM5            | UNUSED                | Can not be used, no connected hardware                    |
+| TCC0               | ???                   | Can use this for Hardware Servo PWM, rather than software |
+| TCC1               | ???                   | Could Use this to drive OUTPUT 2                          |
+| TCC2               | ???                   |                                                           |
+| TC3                | ???                   | Could Use this to drive OUTPUT 1                          |
+| TC4                | ???                   | Could Use this to drive OUTPUT 4 & 5                      |
+| TC5                | Tone Generation       | Used by Arduino TONE Library                              |
+| TC6                | ???                   | Could Use this to drive OUTPUT 3                          |
+| TC7                | ???                   |                                                           |
+| ADC                | UNUSED                | NO ADC Functions                                          |
+| AC                 | UNUSED                | NO AC Functions                                           |
+| DAC                | UNUSED                | NO DAC Functions                                          |
+| PTC                | UNUSED                | NO PTC Functions                                          |
+| I2S                | UNUSED                | NO I2S Functions                                          |
 
 ## Reflow Wizard - Version Log
 
