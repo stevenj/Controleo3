@@ -506,6 +506,9 @@ userChangedMindAboutAborting:
         }
         // Intentional fall-through if under temperature ...
 
+        //[[gnu::fallthrough]]; // C++11 and C++14
+        //[[fallthrough]]; // C++17
+        __attribute__ ((fallthrough)); //C and C++03
       case REFLOW_PID:
         // Make changes every second
         if (!isOneSecondInterval)
