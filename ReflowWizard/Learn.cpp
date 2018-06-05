@@ -300,7 +300,7 @@ userChangedMindAboutAborting:
             // Increase duty cycles
             if (learningDutyCycle < 100)
               learningDutyCycle++;
-              SerialUSB.println("Under-temp. Increasing duty cycle");
+            SerialUSB.println("Under-temp. Increasing duty cycle");
           }
         }
         
