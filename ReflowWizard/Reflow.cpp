@@ -124,6 +124,9 @@ userChangedMindAboutAborting:
           break;
         // Intentional fall-through (simulate user tapped Cancel) ...
 
+        //[[gnu::fallthrough]]; // C++11 and C++14
+        //[[fallthrough]]; // C++17
+        __attribute__ ((fallthrough)); //C and C++03
       case 1:
         // This is the cancel button of the Abort dialog.  User wants to continue
         // Erase the Abort dialog
