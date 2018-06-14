@@ -56,7 +56,7 @@ A Servo output is available.  Servo Control uses Timer Counter 3 for Timing cont
 
 | SAMD21 IO     | FUNCTION      | Note                       |
 | ------------- | ------------- | -------------------------- |
-| PB31          | SERVO OUTPUT  | TCC0/WO[0] TCC1/WO[3]      |
+| PB31          | SERVO OUTPUT  | TCC0/WO[1] TCC1/WO[3]      |
 
 #### SERVO - Notes
 
@@ -101,6 +101,10 @@ The SDCard is an SPI device, AND it is connected to the SERCOM 0 which can imple
 It MAY be possible to use hardware SPI for READ ONLY, but for any Write or full duplex operation the SPI must be bit bashed.
 
 Note, the software also contains a comment seemingly bragging about a low low speed of 1.25Mhz bit bashed as some sort of accomplishment.  It is very strange.
+
+SD Card Detect is an Input.  To read the state it needs to be configured: INPUT ENABLE, PULL ENABLED and the OUT REGISTER SET TO PULL UP.  Otherwise it can not be read at the input.
+0 = Card Inserted
+1 = Card Removed
 
 ### LCD
 
@@ -201,13 +205,13 @@ flash a connected LED.  For Debugging Purposes.
 
 | SAMD21 HW          | ALLOCATION            | Note                                                      |
 | ------------------ | --------------------- | --------------------------------------------------------- |
-| NMI IRQ            |                       |                                                           |
+| NMI IRQ            | ????                      |                                                           |
 | SVC IRQ            | ????                  |                                                           |
 | SYSTICK            | System Timer          | ms Timer, used by Arduino and FreeRTOS for its scheduler. |
 | WATCHDOG           | ????                  |                                                           |  |
 | REALTIME CLOCK     | ????                  |                                                           |  |
 | EXTERNAL INTERRUPT | ????                  |                                                           |
-| USB                | Serial Comms          |                                                           |
+| USB                | Serial Comms          | Using Arduino USB Serial Library                                                          |
 | SERCOM0            | UNUSED                | Maybe can be used for SD Card Reading                     |
 | SERCOM1            | UNUSED                | Can not be used, no connected hardware                    |
 | SERCOM2            | UNUSED                | Can not be used, no connected hardware                    |
