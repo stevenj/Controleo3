@@ -1,46 +1,22 @@
 {
+    "version": 4,
     "configurations": [
         {
-            "name": "Arduino SAMD21",
-            "includePath": [
-                "~/.arduino15/packages/arduino/tools/CMSIS/4.5.0/CMSIS/Include/",
-                "~/.arduino15/packages/arduino/tools/CMSIS-Atmel/1.1.0/CMSIS/Device/ATMEL/",
-                "~/.arduino15/packages/arduino/hardware/samd/1.6.18/cores/arduino",
-                "~/.arduino15/packages/arduino/hardware/samd/1.6.18/variants/arduino_zero/"                
-            ],
+            "intelliSenseMode": "clang-x64",
+            "name": "Auto",
+            "includePath": [],
             "defines": [
-                "F_CPU=48000000L",
-                "ARDUINO=10805",
-                "ARDUINO_SAMD_ZERO",
-                "ARDUINO_ARCH_SAMD",
-                "__SAMD21G18A__",
-                "USB_VID=0x2341",
-                "USB_PID=0x804d",
-                "USBCON",
-                "USB_MANUFACTURER=\"Arduino LLC\"'",
-                "USB_PRODUCT=\"Arduino Zero\""
+                "__SAMD21J18A__"
             ],
             "browse": {
-                "limitSymbolsToIncludedHeaders": false,
                 "path": [
-                    "${workspaceRoot}/ReflowWizard",
-                    "~/.arduino15/packages/arduino/tools/CMSIS/4.5.0/CMSIS/Include/",
-                    "~/.arduino15/packages/arduino/tools/CMSIS-Atmel/1.1.0/CMSIS/Device/ATMEL/",
-                    "~/.arduino15/packages/arduino/hardware/samd/1.6.18/cores/arduino",
-                    "~/.arduino15/packages/arduino/hardware/samd/1.6.18/variants/arduino_zero/"                
+                    "${workspaceRoot}/OvenACE"
+
                 ]
             },
-            "files" : {
-                "exclude" : [
-                    "${workspaceRoot}/build",
-                    "${workspaceRoot}/ReflowWizard/src/Arduino-FreeRTOS-SAMD21/examples"
-                ]
-            },
-            "intelliSenseMode": "clang-x64",
-            "compilerPath": "~/.arduino15/packages/arduino/tools/arm-none-eabi-gcc/4.8.3-2014q1/bin/arm-none-eabi-g++ -mcpu=cortex-m0plus -mthumb",
+            "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
-            "cppStandard": "c++11"
+            "cppStandard": "c++14"
         }
-    ],
-    "version": 4
+    ]
 }

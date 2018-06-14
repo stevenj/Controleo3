@@ -43,6 +43,9 @@
         "rope": "c",
         "slist": "c",
         "initializer_list": "c",
-        "valarray": "c"
-    }
+        "valarray": "c",
+        "*.ipp": "c"
+    },
+    "python.pythonPath": "/usr/bin/python3",
+    "git.ignoreLimitWarning": true,
 }
