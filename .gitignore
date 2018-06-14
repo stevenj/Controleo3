@@ -1,2 +1,5 @@
 build
 .deps
+atstart
+freertos
+bootloader-sizes.md

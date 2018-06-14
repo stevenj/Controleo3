@@ -1,6 +1,3 @@
-[submodule "ReflowWizard/src/Arduino-FreeRTOS-SAMD21"]
-	path = ReflowWizard/src/Arduino-FreeRTOS-SAMD21
-	url = git@github.com:stevenj/Arduino-FreeRTOS-SAMD21.git
 [submodule "fabricate"]
 	path = fabricate
 	url = git@github.com:stevenj/fabricate.git
