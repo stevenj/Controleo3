@@ -6,4 +6,4 @@
 	url = git@github.com:stevenj/fabricate.git
 [submodule "bootloader/uf2-samdx1"]
 	path = bootloader/uf2-samdx1
-	url = https://github.com/Microsoft/uf2-samdx1.git
+	url = git@github.com:stevenj/uf2-samdx1.git
