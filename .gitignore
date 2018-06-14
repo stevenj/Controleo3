@@ -3,3 +3,4 @@ build
 atstart
 freertos
 bootloader-sizes.md
+makefile-buildlog.txt
