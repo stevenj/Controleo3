@@ -94,6 +94,20 @@ An SD Card interface is available, and is using the SDCard in SPI Mode.
 | PA6           | MOSI         | SERCOM0[2] - SERCOM DO  (DOPO 0x1)     |
 | PA7           | CS           | SERCOM0[3] - CS Software Controlled    |
 
+#### Hardware Modification
+
+A Hardware modification to PA6 and PA7 to swap them over (like so):
+
+| SAMD21 IO     | FUNCTION     | Note                                   |
+| ------------- | ------------ | -------------------------------------- |
+| PA2           | CD           | SD Card Detect                         |
+| PA4           | MISO         | SERCOM0[0] - SERCOM DI (DIPO 0x0)      |
+| PA5           | CLK          | SERCOM0[1] - SERCOM CLK (DOPO 0x0)     |
+| PA6           | CS           | SERCOM0[2] - SERCOM DO  (DOPO 0x0)     |
+| PA7           | MOSI         | SERCOM0[3] - CS Software Controlled    |
+
+ This would allow use of hardware spi and dma for significantly improved sdcard performance.
+
 #### SDCard - Notes
 
 The SDCard is an SPI device, AND it is connected to the SERCOM 0 which can implement hardware SPI.  BUT Because it as been inexplicably wired up in such a way as to prevent the use of hardware SPI, it MUST BE BIT BASHED.  This is totally unnecessary and a waste of hardware resources.  **BAD HARDWARE DESIGN that must be corrected with software.**
