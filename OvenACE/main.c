@@ -1,4 +1,5 @@
 #include "atmel_asf4.h"
+#include "debug_leds.h"
 
 void vConfigureTimerForRunTimeStats(void)
 {
@@ -17,13 +18,21 @@ void hwinit(void)
 
 }
 
+void subsystem_init(void)
+{
+	initDebugLeds();
+}
+
 int main(void)
 {
 	/* Initializes MCU, drivers and middleware */
 	hwinit();
-	FREERTOS_V1000_0_example();
+	subsystem_init();
 
 	/* Replace with your application code */
-	while (1) {
+	vTaskStartScheduler();
+
+	while (1) { 
+		/* We only get here if the RTOS fails */ 
 	}
 }
