@@ -58,15 +58,17 @@ BUILD={
     #   'SCRIPT' is a Build Script.
     'TOOLS' : {
         'PATH': {
-            'ARM'   : "/opt/arm/gcc-arm-none-eabi-7-2017-q4-major/bin",
-            'TOOL'  : "../Tools",
-            'SCRIPT': "fabricate/scripts",
+            'ARM'    : "/opt/arm/gcc-arm-none-eabi-7-2017-q4-major/bin",
+            'TOOL'   : "../Tools",
+            'SCRIPT' : "fabricate/scripts",
+            'UF2CONV': "fabricate/scripts"
         },
         'GCC'      : {'ARM' : "arm-none-eabi-gcc"},
         'GXX'      : {'ARM' : "arm-none-eabi-gcc"},
         'GAS'      : {'ARM' : "arm-none-eabi-gcc"},
         'OBJ-COPY' : {'ARM' : "arm-none-eabi-objcopy"},
         'OBJ-DUMP' : {'ARM' : "arm-none-eabi-objdump"},
+        'UF2CONV'  : {'ARM' : "uf2conv.py"}
     }, # END TOOLS
 
     # The Options we pass to the Tools.
@@ -150,13 +152,12 @@ BUILD={
                 'CFLAGS' : [ # Passed to GCC when linking.
                     "-mcpu="+TARGET['CPU'],
                     "-mtune="+TARGET['CPU'],
-#                    "-nostartfiles",
-#                   "--specs=nano.specs", # Only use if the program is too big.
-#                   "--specs=nosys.specs",
-#                   "-nostdlib", // We need memcpy/memset, etc.
                 ],
                 'CFLAGS:DEBUG' : [
                     "-ggdb3",
+                ],
+                'CFLAGS:OPT-SIZE' : [
+                    "--specs=nano.specs",
                 ],
                 'LDFLAGS' : [ # These are passed to the linker (by GCC), using "-Wl"
                     "-T","OvenACE/samd21a/gcc/gcc/samd21j18a_flash.ld",
@@ -182,7 +183,7 @@ BUILD={
     #       1: to build "build" tools from source
     #       2: to fetch or update externally maintained source repositories.
     #       3: To generate code files from data.
-    #       4: Any other prilimary or utility pre-build function
+    #       4: Any other preliminary or utility pre-build function
     #           Technically autotools type configuration tests could be
     #           integrated at this point.
     #   All External builds are completed before the main build starts.
@@ -203,7 +204,7 @@ BUILD={
     #     'APP'     - Optional - Marks a Package as the main application.
     #     'LISTING' - Optional - Generates an assembler listing of each file.  Option is passed to the assembler to control the listing.
     #     'SRC'     - List of Source Files to Build.
-    #                 Each element may be a single file, or a tupple.
+    #                 Each element may be a single file, or a tuple.
     #                 the single file is equivalent to a tuple (file, BUILD[BUILD_DIR], 0)
     #                 the tuple is:
     #                     (src file, dest directory, the number of path elements to strip from source to destination)
@@ -222,10 +223,21 @@ BUILD={
             'MAP'     : "OvenACE.map",
             'DUMP'    : "OvenACE.dump",
             'HEX'     : "OvenACE.hex",
+            'BIN'     : "OvenACE.bin",
+            'UF2'     : "OvenACE.uf2",
             'HEX_FLAGS' : [
                 "-j",".text",
                 "-j",".data",
                 "-O","ihex",
+            ],
+            'BIN_FLAGS' : [
+                "-j",".text",
+                "-j",".data",
+                "-O","binary",
+            ],
+            'UF2_FLAGS' : [
+                "-b", "0x2000",
+                "-c",
             ],
             'DUMP_FLAGS' : [
                 "-xdSs",
@@ -242,13 +254,8 @@ BUILD={
             ],
 
             'SRC'     : [
-#                'ReflowWizard/main.cpp',  
-                # 'ReflowWizard/syscalls.c',  
             ] + util.all_files_in('OvenACE','.c',True),
-            # + util.all_files_in('ReflowWizard/system','.c',True),
-            # + util.all_files_in('ReflowWizard/atstart','.c',True),
             'INCLUDE' : [
-#                "ReflowWizard",                
             ] + util.all_directories_of('OvenACE','.h'),
 
             'SYSINCLUDE' : [
@@ -270,7 +277,6 @@ def compile():
         for buildtype in BUILD['BUILDS'] :
             if buildtype in BUILD_TYPES:
                 gen.module_maker(BUILD,'SOURCE', buildtype)
-
 
 def package():
     # We would package up our build here, if need be.
