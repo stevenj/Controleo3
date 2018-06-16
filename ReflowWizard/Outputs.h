@@ -5,7 +5,7 @@
 
 extern volatile uint32_t *portAOut, *portAMode, *portBOut, *portBMode;
 
-// Initialize the registers controlling the outputs, and turn them off
+// Initialize the registers controlling the outputs, and turn them off.
 void initOutputs(void);
 
 // Turn an output on or off

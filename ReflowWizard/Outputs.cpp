@@ -21,15 +21,75 @@
 //  - Output 6 = PB11 (Arduino = SCK)
 //
 //  On the board (and in the build guide) the outputs are 1 through 6. In software they are 0 through 5.
+#include <Arduino.h>
+
 #include "Outputs.h"
 #include "bits.h"
 #include "ReflowWizard.h"
+
+#include "SimplePIO.h"
+
+// HARDWARE DEFINTIONS
+#define OUTPUT1 PA(15)
+#define OUTPUT2 PB(30)
+#define OUTPUT3 PB(17)
+#define OUTPUT4 PB(9)
+#define OUTPUT5 PB(8)
+
+#define STATUS_LED    PB(11)  // Was Defined as Output 6 originally
+#define HEARTBEAT_LED PA(30)  // Used as SWCLK when debugging
+#define OSERROR_LED   PA(31)  // Used as SWDIO when debugging
 
 volatile uint32_t *portAOut, *portAMode, *portBOut, *portBMode;
 static boolean outputState[NUMBER_OF_OUTPUTS];
 
 // Initialize the registers controlling the outputs, and turn them off
 void initOutputs() {
+
+  // This hardware is all GPIO and ALL Outputs.
+  PORT_OUTPUT(PBIT(OUTPUT1) | 
+              PBIT(OUTPUT2) |
+              PBIT(OUTPUT3) |
+              PBIT(OUTPUT4) |
+              PBIT(OUTPUT5) |
+              PBIT(STATUS_LED) |
+              PBIT(HEARTBEAT_LED) |
+              PBIT(OSERROR_LED)); // Set these pins as OUTPUTS.
+
+  // DONT assume anything, set the pin modes to GPIO.
+  // Relay Control Outputs set as:
+  //    MUX Disabled (GPIO)
+  //    Input Buffer Enabled (So we can read the IN Regsiter).
+  //    Internal Pull Up/Down Resistor disabled.
+  //    Normal Drive Strength
+  PORT_PINCFG(OUTPUT1) = (PORT_PINCFG_INEN); 
+  PORT_PINCFG(OUTPUT2) = (PORT_PINCFG_INEN); 
+  PORT_PINCFG(OUTPUT3) = (PORT_PINCFG_INEN); 
+  PORT_PINCFG(OUTPUT4) = (PORT_PINCFG_INEN); 
+  PORT_PINCFG(OUTPUT5) = (PORT_PINCFG_INEN); 
+
+  // Status LED Outputs set as:
+  //    MUX Disabled (GPIO)
+  //    Input Buffer Enabled (So we can read the IN Regsiter).
+  //    Internal Pull Up/Down Resistor disabled.
+  //    High Drive Strength (Because we are directly driving LEDs with the Output).
+  PORT_PINCFG(STATUS_LED)    = (PORT_PINCFG_INEN | PORT_PINCFG_DRVSTR); 
+  PORT_PINCFG(HEARTBEAT_LED) = (PORT_PINCFG_INEN | PORT_PINCFG_DRVSTR); 
+  PORT_PINCFG(OSERROR_LED)   = (PORT_PINCFG_INEN | PORT_PINCFG_DRVSTR); 
+
+  // Set all OUTPUTS Low (Disable Relays)
+  PORT_OUTPUT_LOW(PBIT(OUTPUT1) | 
+                  PBIT(OUTPUT2) |
+                  PBIT(OUTPUT3) |
+                  PBIT(OUTPUT4) |
+                  PBIT(OUTPUT5) |
+                  PBIT(STATUS_LED) |
+                  PBIT(HEARTBEAT_LED) |
+                  PBIT(OSERROR_LED));
+
+  // Testing code
+  PORT_OUTPUT_HIGH(PBIT(STATUS_LED));
+
   // Get pointer to the registers
   portAOut   = portOutputRegister(digitalPinToPort(5));
   portAMode  = portModeRegister(digitalPinToPort(5));
@@ -37,12 +97,12 @@ void initOutputs() {
   portBMode  = portModeRegister(digitalPinToPort(A2)); 
 
   // Set all I/O modes to outputs
-  *portAMode |= SETBIT15;
-  *portBMode |= (SETBIT08 + SETBIT09 + SETBIT11 + SETBIT17 + SETBIT30);
+//  *portAMode |= SETBIT15;
+//  *portBMode |= (SETBIT08 + SETBIT09 + SETBIT11 + SETBIT17 + SETBIT30);
 
   // Set all outputs low (turn off relays)
-  for (int i=0; i<=NUMBER_OF_OUTPUTS; i++)
-    setOutput(i, LOW);
+//  for (int i=0; i<=NUMBER_OF_OUTPUTS; i++)
+//    setOutput(i, LOW);
 }
 
 
