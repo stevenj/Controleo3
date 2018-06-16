@@ -5,8 +5,8 @@
  * Please copy examples or other code you want to keep to a separate file or main.c
  * to avoid loosing it when reconfiguring.
  */
-#include "atmel_start.h"
-#include "usb_start.h"
+#include "atmel_asf4.h"
+#include "usb_handler.h"
 
 /* Max LUN number */
 #define CONF_USB_MSC_MAX_LUN 0
@@ -293,12 +293,6 @@ void composite_device_init(void)
 #if CONF_USB_COMPOSITE_CDC_ACM_EN
 	cdcdf_acm_init();
 #endif
-#if CONF_USB_COMPOSITE_HID_MOUSE_EN
-	hiddf_mouse_init();
-#endif
-#if CONF_USB_COMPOSITE_HID_KEYBOARD_EN
-	hiddf_keyboard_init();
-#endif
 #if CONF_USB_COMPOSITE_MSC_EN
 	mscdf_init(CONF_USB_MSC_MAX_LUN);
 #endif
@@ -310,8 +304,9 @@ void composite_device_start(void)
 	usbdc_attach();
 }
 
-void composite_device_example(void)
+static void USB_Handler_task(void *p)
 {
+	(void)p; // Unused
 
 	/* Initialize */
 	/* It's done with system init ... */
@@ -327,20 +322,26 @@ void composite_device_example(void)
 		if (cdcdf_acm_is_enabled()) {
 			/* CDC ACM process*/
 		}
-		if (hiddf_mouse_is_enabled()) {
-			/* HID Mouse process */
-		}
-		if (hiddf_keyboard_is_enabled()) {
-			/* HID Keyboard process */
-		};
 		if (mscdf_is_enabled()) {
 			/* MSC process */
 		}
 	}
 }
 
+#define USBTASK_STACK_SIZE (256 / sizeof(portSTACK_TYPE))
+#define USBTASK_PRIORITY   (tskIDLE_PRIORITY + 1)
+
+static TaskHandle_t      xUSBTask;
+
+
 void usb_init(void)
 {
-
 	composite_device_init();
+
+	// Create task which handles the USB Comms
+	xTaskCreate(
+        USB_Handler_task, "USB Handler", 
+        USBTASK_STACK_SIZE, NULL, 
+        USBTASK_PRIORITY, xUSBTask);
+
 }

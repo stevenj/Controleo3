@@ -1,5 +1,6 @@
 #include "atmel_asf4.h"
 #include "debug_leds.h"
+#include "usb_handler.h"
 
 void vConfigureTimerForRunTimeStats(void)
 {
@@ -10,7 +11,7 @@ uint32_t vGetRunTimeCounterValue(void)
 	return 1;
 }
 
-void hwinit(void) 
+void hw_init(void) 
 {
 	system_init();
 	usb_init();
@@ -21,12 +22,13 @@ void hwinit(void)
 void subsystem_init(void)
 {
 	initDebugLeds();
+	usb_init();
 }
 
 int main(void)
 {
 	/* Initializes MCU, drivers and middleware */
-	hwinit();
+	hw_init();
 	subsystem_init();
 
 	/* Replace with your application code */
