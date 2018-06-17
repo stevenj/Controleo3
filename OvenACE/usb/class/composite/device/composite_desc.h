@@ -36,7 +36,6 @@
 #include "usb_protocol.h"
 #include "usbd_config.h"
 
-#if CONF_USB_COMPOSITE_CDC_ACM_EN == 1
 #define CONF_CDC_ACM_IFC_LEN 66
 #define CONF_CDC_ACM_IFC_NUM 2
 #define CONF_USB_COMPOSITE_CDC_ACM_COMM_BIFCNUM 0
@@ -85,71 +84,13 @@
 	                        2,                                                                                         \
 	                        CONF_USB_COMPOSITE_CDC_ACM_DATA_BULKIN_MAXPKSZ_HS,                                         \
 	                        0x00),
-#else
-#define CONF_CDC_ACM_IFC_LEN 0
-#define CONF_CDC_ACM_IFC_NUM 0
-#define CONF_USB_COMPOSITE_CDC_ACM_COMM_BIFCNUM -2
-#define CONF_USB_COMPOSITE_CDC_ACM_DATA_BIFCNUM -1
-#define CONF_CDC_ACM_IFC_DESC
-#define CONF_CDC_ACM_IFC_DESC_HS
-#endif
 
-#if CONF_USB_COMPOSITE_HID_MOUSE_EN == 1
-#define CONF_HID_MOUSE_IFC_LEN 25
-#define CONF_HID_MOUSE_IFC_NUM 1
-#define CONF_USB_COMPOSITE_HID_MOUSE_BIFCNUM (CONF_USB_COMPOSITE_CDC_ACM_DATA_BIFCNUM + 1)
-#define CONF_HID_MOUSE_IFC_DESC                                                                                        \
-	USB_IFACE_DESC_BYTES(CONF_USB_COMPOSITE_HID_MOUSE_BIFCNUM, 0x00, 0x01, 0x03, 0x01, 0x02, 0x00)                     \
-	, USB_HID_DESC_BYTES(0x09, 0x21, 0x01, 0x22, 0x34),                                                                \
-	    USB_ENDP_DESC_BYTES(                                                                                           \
-	        CONF_USB_COMPOSITE_HID_MOUSE_INTIN_EPADDR, 0x03, CONF_USB_COMPOSITE_HID_MOUSE_INTIN_MAXPKSZ, 10),
-#else
-#define CONF_HID_MOUSE_IFC_LEN 0
-#define CONF_HID_MOUSE_IFC_NUM 0
-#define CONF_USB_COMPOSITE_HID_MOUSE_BIFCNUM CONF_USB_COMPOSITE_CDC_ACM_DATA_BIFCNUM
-#define CONF_HID_MOUSE_IFC_DESC
-#endif
 
-#if CONF_USB_COMPOSITE_HID_KEYBOARD_EN == 1
-#define CONF_HID_KEYBOARD_IFC_LEN 32
-#define CONF_HID_KEYBOARD_IFC_NUM 1
-#define CONF_USB_COMPOSITE_HID_KEYBOARD_BIFCNUM (CONF_USB_COMPOSITE_HID_MOUSE_BIFCNUM + 1)
-#define CONF_HID_KEYBOARD_IFC_DESC                                                                                     \
-	USB_IFACE_DESC_BYTES(CONF_USB_COMPOSITE_HID_KEYBOARD_BIFCNUM, 0x00, 0x02, 0x03, 0x01, 0x01, 0x00)                  \
-	, USB_HID_DESC_BYTES(0x09, 0x21, 0x01, 0x22, 59),                                                                  \
-	    USB_ENDP_DESC_BYTES(                                                                                           \
-	        CONF_USB_COMPOSITE_HID_KEYBOARD_INTIN_EPADDR, 0x03, CONF_USB_COMPOSITE_HID_KEYBOARD_INTIN_MAXPKSZ, 10),    \
-	    USB_ENDP_DESC_BYTES(                                                                                           \
-	        CONF_USB_COMPOSITE_HID_KEYBOARD_INTOUT_EPADDR, 0x03, CONF_USB_COMPOSITE_HID_KEYBOARD_INTOUT_MAXPKSZ, 10),
-#else
-#define CONF_HID_KEYBOARD_IFC_LEN 0
-#define CONF_HID_KEYBOARD_IFC_NUM 0
-#define CONF_USB_COMPOSITE_HID_KEYBOARD_BIFCNUM CONF_USB_COMPOSITE_HID_MOUSE_BIFCNUM
-#define CONF_HID_KEYBOARD_IFC_DESC
-#endif
 
-#if CONF_USB_COMPOSITE_HID_GENERIC_EN == 1
-#define CONF_HID_GENERIC_IFC_LEN 32
-#define CONF_HID_GENERIC_IFC_NUM 1
-#define CONF_USB_COMPOSITE_HID_GENERIC_BIFCNUM (CONF_USB_COMPOSITE_HID_KEYBOARD_BIFCNUM + 1)
-#define CONF_HID_GENERIC_IFC_DESC                                                                                      \
-	USB_IFACE_DESC_BYTES(CONF_USB_COMPOSITE_HID_GENERIC_BIFCNUM, 0x00, 0x02, 0x03, 0x00, 0x00, 0x00)                   \
-	, USB_HID_DESC_BYTES(0x09, 0x21, 0x01, 0x22, CONF_USB_COMPOSITE_HID_GENERIC_REPORT_LEN),                           \
-	    USB_ENDP_DESC_BYTES(                                                                                           \
-	        CONF_USB_COMPOSITE_HID_GENERIC_INTIN_EPADDR, 0x03, CONF_USB_COMPOSITE_HID_GENERIC_INTIN_MAXPKSZ, 10),      \
-	    USB_ENDP_DESC_BYTES(                                                                                           \
-	        CONF_USB_COMPOSITE_HID_GENERIC_INTOUT_EPADDR, 0x03, CONF_USB_COMPOSITE_HID_GENERIC_INTOUT_MAXPKSZ, 10),
-#else
-#define CONF_HID_GENERIC_IFC_LEN 0
-#define CONF_HID_GENERIC_IFC_NUM 0
-#define CONF_USB_COMPOSITE_HID_GENERIC_BIFCNUM CONF_USB_COMPOSITE_HID_KEYBOARD_BIFCNUM
-#define CONF_HID_GENERIC_IFC_DESC
-#endif
 
-#if CONF_USB_COMPOSITE_MSC_EN == 1
 #define CONF_MSC_IFC_LEN 23 /* (9 + 7 * 2) */
 #define CONF_MSC_IFC_NUM 1
-#define CONF_USB_COMPOSITE_MSC_BIFCNUM (CONF_USB_COMPOSITE_HID_GENERIC_BIFCNUM + 1)
+#define CONF_USB_COMPOSITE_MSC_BIFCNUM (CONF_USB_COMPOSITE_CDC_ACM_DATA_BIFCNUM + 1)
 #define CONF_MSC_IFC_DESC                                                                                              \
 	USB_IFACE_DESC_BYTES(CONF_USB_COMPOSITE_MSC_BIFCNUM, 0x00, 0x02, 0x08, 0x06, 0x50, 0x00)                           \
 	, USB_ENDP_DESC_BYTES(CONF_USB_COMPOSITE_MSC_BULKIN_EPADDR, 0x02, CONF_USB_COMPOSITE_MSC_BULK_MAXPKSZ, 0),         \
@@ -158,22 +99,12 @@
 	USB_IFACE_DESC_BYTES(CONF_USB_COMPOSITE_MSC_BIFCNUM, 0x00, 0x02, 0x08, 0x06, 0x50, 0x00)                           \
 	, USB_ENDP_DESC_BYTES(CONF_USB_COMPOSITE_MSC_BULKIN_EPADDR, 0x02, CONF_USB_COMPOSITE_MSC_BULK_MAXPKSZ_HS, 0),      \
 	    USB_ENDP_DESC_BYTES(CONF_USB_COMPOSITE_MSC_BULKOUT_EPADDR, 0x02, CONF_USB_COMPOSITE_MSC_BULK_MAXPKSZ_HS, 0),
-#else
-#define CONF_MSC_IFC_LEN 0
-#define CONF_MSC_IFC_NUM 0
-#define CONF_USB_COMPOSITE_MSC_BIFCNUM CONF_USB_COMPOSITE_HID_GENERIC_BIFCNUM
-#define CONF_MSC_IFC_DESC
-#define CONF_MSC_IFC_DESC_HS
-#endif
 
 #define CONF_USB_COMPOSITE_TOTAL_LEN                                                                                   \
-	(USB_CONFIG_DESC_LEN + CONF_CDC_ACM_IFC_LEN + CONF_HID_MOUSE_IFC_LEN + CONF_HID_KEYBOARD_IFC_LEN                   \
-	 + CONF_HID_GENERIC_IFC_LEN                                                                                        \
-	 + CONF_MSC_IFC_LEN)
+	(USB_CONFIG_DESC_LEN + CONF_CDC_ACM_IFC_LEN + CONF_MSC_IFC_LEN)
 
 #define CONF_USB_COMPOSITE_IFC_NUM                                                                                     \
-	(CONF_CDC_ACM_IFC_NUM + CONF_HID_MOUSE_IFC_NUM + CONF_HID_KEYBOARD_IFC_NUM + CONF_HID_GENERIC_IFC_NUM              \
-	 + CONF_MSC_IFC_NUM)
+	(CONF_CDC_ACM_IFC_NUM + CONF_MSC_IFC_NUM)
 
 #define COMPOSITE_DEV_DESC                                                                                             \
 	USB_DEV_DESC_BYTES(CONF_USB_COMPOSITE_BCDUSB,                                                                      \
@@ -211,16 +142,10 @@
 
 #define COMPOSITE_IFACE_DESCES                                                                                         \
 	CONF_CDC_ACM_IFC_DESC                                                                                              \
-	CONF_HID_MOUSE_IFC_DESC                                                                                            \
-	CONF_HID_KEYBOARD_IFC_DESC                                                                                         \
-	CONF_HID_GENERIC_IFC_DESC                                                                                          \
 	CONF_MSC_IFC_DESC
 
 #define COMPOSITE_IFACE_DESCES_HS                                                                                      \
 	CONF_CDC_ACM_IFC_DESC_HS                                                                                           \
-	CONF_HID_MOUSE_IFC_DESC                                                                                            \
-	CONF_HID_KEYBOARD_IFC_DESC                                                                                         \
-	CONF_HID_GENERIC_IFC_DESC                                                                                          \
 	CONF_MSC_IFC_DESC_HS
 
 #define COMPOSITE_STR_DESCESS                                                                                          \

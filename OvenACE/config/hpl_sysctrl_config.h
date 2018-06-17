@@ -237,7 +237,7 @@
 // <i> Enable 32 Khz Output
 // <id> xosc32k_arch_en32k
 #ifndef CONF_XOSC32K_EN32K
-#define CONF_XOSC32K_EN32K 0
+#define CONF_XOSC32K_EN32K 1
 #endif
 
 // <q> Enable XTAL
@@ -274,7 +274,7 @@
 // <i> Default: 122 us
 // <id> xosc32k_arch_startup
 #ifndef CONF_XOSC32K_STARTUP
-#define CONF_XOSC32K_STARTUP CONF_XOSC32K_STARTUP_TIME_1068MCS
+#define CONF_XOSC32K_STARTUP CONF_XOSC32K_STARTUP_TIME_125092MCS
 #endif
 
 // </h>
@@ -410,7 +410,7 @@
 // <i> Indicates whether configuration for DFLL is enabled or not
 // <id> enable_dfll48m
 #ifndef CONF_DFLL_CONFIG
-#define CONF_DFLL_CONFIG 0
+#define CONF_DFLL_CONFIG 1
 #endif
 
 // <y> Reference Clock Source
@@ -425,7 +425,7 @@
 // <i> Select the clock source.
 // <id> dfll48m_ref_clock
 #ifndef CONF_DFLL_GCLK
-#define CONF_DFLL_GCLK GCLK_CLKCTRL_GEN_GCLK7_Val
+#define CONF_DFLL_GCLK GCLK_CLKCTRL_GEN_GCLK2_Val
 #endif
 
 // <h> DFLL Control
@@ -433,7 +433,7 @@
 // <i> Indicates whether DFLL is enabled or not
 // <id> dfll48m_arch_enable
 #ifndef CONF_DFLL_ENABLE
-#define CONF_DFLL_ENABLE 0
+#define CONF_DFLL_ENABLE 1
 #endif
 
 // <q> Wait Lock
@@ -486,7 +486,7 @@
 // <i> USB Clock Recovery Mode
 // <id> dfll48m_arch_usbcrm
 #ifndef CONF_DFLL_USBCRM
-#define CONF_DFLL_USBCRM 1
+#define CONF_DFLL_USBCRM 0
 #endif
 
 #if CONF_DFLL_USBCRM == 1
@@ -511,7 +511,7 @@
 // <i> If 1: FINE calibration register value will be fixed after a fine lock.
 // <id> dfll48m_arch_stable
 #ifndef CONF_DFLL_STABLE
-#define CONF_DFLL_STABLE 1
+#define CONF_DFLL_STABLE 0
 #endif
 
 // <y> Operating Mode Selection
@@ -540,7 +540,7 @@
 //  <i> Default: 0
 //  <id> dfll48m_mul
 #ifndef CONF_DFLL_MUL
-#define CONF_DFLL_MUL 1464
+#define CONF_DFLL_MUL 1465
 #endif
 
 // <e> DFLL Calibration Overwrite
@@ -655,14 +655,14 @@
 // <i> Set the  fractional part of the frequency multiplier.
 // <id> fdpll96m_ldrfrac
 #ifndef CONF_DPLL_LDRFRAC
-#define CONF_DPLL_LDRFRAC 11
+#define CONF_DPLL_LDRFRAC 13
 #endif
 
 // <o>DPLL LDR <0-4095>
 // <i> Set the  integer part of the frequency multiplier.
 // <id> fdpll96m_ldr
 #ifndef CONF_DPLL_LDR
-#define CONF_DPLL_LDR 2928
+#define CONF_DPLL_LDR 1756
 #endif
 
 // </h>

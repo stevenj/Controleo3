@@ -13,7 +13,6 @@ extern "C" {
 #endif // __cplusplus
 
 #include "cdcdf_acm.h"
-#include "hiddf_generic.h"
 #include "mscdf.h"
 #include "composite_desc.h"
 

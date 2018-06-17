@@ -290,12 +290,8 @@ void composite_device_init(void)
 	usbdc_init(ctrl_buffer);
 
 /* usbdc_register_funcion inside */
-#if CONF_USB_COMPOSITE_CDC_ACM_EN
 	cdcdf_acm_init();
-#endif
-#if CONF_USB_COMPOSITE_MSC_EN
 	mscdf_init(CONF_USB_MSC_MAX_LUN);
-#endif
 }
 
 void composite_device_start(void)

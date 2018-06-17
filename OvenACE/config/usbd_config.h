@@ -19,7 +19,7 @@
 // <e> Enable String Descriptors
 // <id> usb_composite_str_en
 #ifndef CONF_USB_COMPOSITE_STR_EN
-#define CONF_USB_COMPOSITE_STR_EN 0
+#define CONF_USB_COMPOSITE_STR_EN 1
 #endif
 // <s> Language IDs
 // <i> Language IDs in c format, split by comma (E.g., 0x0409 ...)
@@ -29,7 +29,7 @@
 #endif
 
 #ifndef CONF_USB_COMPOSITE_LANGID_DESC
-#define CONF_USB_COMPOSITE_LANGID_DESC
+#define CONF_USB_COMPOSITE_LANGID_DESC 4, 0x03, 0x09, 0x04,
 #endif
 // </e>
 
@@ -74,7 +74,7 @@
 // <e> Enable string descriptor of iManufact
 // <id> usb_composite_imanufact_en
 #ifndef CONF_USB_COMPOSITE_IMANUFACT_EN
-#define CONF_USB_COMPOSITE_IMANUFACT_EN 0
+#define CONF_USB_COMPOSITE_IMANUFACT_EN 1
 #endif
 
 #ifndef CONF_USB_COMPOSITE_IMANUFACT
@@ -84,11 +84,12 @@
 // <s> Unicode string of iManufact
 // <id> usb_composite_imanufact_str
 #ifndef CONF_USB_COMPOSITE_IMANUFACT_STR
-#define CONF_USB_COMPOSITE_IMANUFACT_STR "Atmel"
+#define CONF_USB_COMPOSITE_IMANUFACT_STR "Whizoo"
 #endif
 
 #ifndef CONF_USB_COMPOSITE_IMANUFACT_STR_DESC
-#define CONF_USB_COMPOSITE_IMANUFACT_STR_DESC
+#define CONF_USB_COMPOSITE_IMANUFACT_STR_DESC                                                                          \
+	14, 0x03, 'W', 0x00, 'h', 0x00, 'i', 0x00, 'z', 0x00, 'o', 0x00, 'o', 0x00,
 #endif
 
 // </e>
@@ -96,7 +97,7 @@
 // <e> Enable string descriptor of iProduct
 // <id> usb_composite_iproduct_en
 #ifndef CONF_USB_COMPOSITE_IPRODUCT_EN
-#define CONF_USB_COMPOSITE_IPRODUCT_EN 0
+#define CONF_USB_COMPOSITE_IPRODUCT_EN 1
 #endif
 
 #ifndef CONF_USB_COMPOSITE_IPRODUCT
@@ -107,11 +108,13 @@
 // <s> Unicode string of iProduct
 // <id> usb_composite_iproduct_str
 #ifndef CONF_USB_COMPOSITE_IPRODUCT_STR
-#define CONF_USB_COMPOSITE_IPRODUCT_STR "Composite Demo"
+#define CONF_USB_COMPOSITE_IPRODUCT_STR "Controleo3"
 #endif
 
 #ifndef CONF_USB_COMPOSITE_IPRODUCT_STR_DESC
-#define CONF_USB_COMPOSITE_IPRODUCT_STR_DESC
+#define CONF_USB_COMPOSITE_IPRODUCT_STR_DESC                                                                           \
+	22, 0x03, 'C', 0x00, 'o', 0x00, 'n', 0x00, 't', 0x00, 'r', 0x00, 'o', 0x00, 'l', 0x00, 'e', 0x00, 'o', 0x00, '3',  \
+	    0x00,
 #endif
 
 // </e>
@@ -119,7 +122,7 @@
 // <e> Enable string descriptor of iSerialNum
 // <id> usb_composite_iserialnum_en
 #ifndef CONF_USB_COMPOSITE_ISERIALNUM_EN
-#define CONF_USB_COMPOSITE_ISERIALNUM_EN 0
+#define CONF_USB_COMPOSITE_ISERIALNUM_EN 1
 #endif
 
 #ifndef CONF_USB_COMPOSITE_ISERIALNUM
@@ -135,7 +138,9 @@
 #endif
 
 #ifndef CONF_USB_COMPOSITE_ISERIALNUM_STR_DESC
-#define CONF_USB_COMPOSITE_ISERIALNUM_STR_DESC
+#define CONF_USB_COMPOSITE_ISERIALNUM_STR_DESC                                                                         \
+	32, 0x03, '1', 0x00, '2', 0x00, '3', 0x00, '4', 0x00, '5', 0x00, '6', 0x00, '7', 0x00, '8', 0x00, '9', 0x00, 'A',  \
+	    0x00, 'B', 0x00, 'C', 0x00, 'D', 0x00, 'E', 0x00, 'F', 0x00,
 #endif
 
 // </e>
@@ -157,7 +162,7 @@
 // <e> Enable string descriptor of iConfig
 // <id> usb_composite_iconfig_en
 #ifndef CONF_USB_COMPOSITE_ICONFIG_EN
-#define CONF_USB_COMPOSITE_ICONFIG_EN 0
+#define CONF_USB_COMPOSITE_ICONFIG_EN 1
 #endif
 
 #ifndef CONF_USB_COMPOSITE_ICONFIG
@@ -170,11 +175,12 @@
 // <s> Unicode string of iConfig
 // <id> usb_composite_iconfig_str
 #ifndef CONF_USB_COMPOSITE_ICONFIG_STR
-#define CONF_USB_COMPOSITE_ICONFIG_STR ""
+#define CONF_USB_COMPOSITE_ICONFIG_STR "iConfig"
 #endif
 
 #ifndef CONF_USB_COMPOSITE_ICONFIG_STR_DESC
-#define CONF_USB_COMPOSITE_ICONFIG_STR_DESC
+#define CONF_USB_COMPOSITE_ICONFIG_STR_DESC                                                                            \
+	16, 0x03, 'i', 0x00, 'C', 0x00, 'o', 0x00, 'n', 0x00, 'f', 0x00, 'i', 0x00, 'g', 0x00,
 #endif
 
 // </e>

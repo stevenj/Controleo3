@@ -226,7 +226,7 @@ to exclude the API function. */
 // <q> Include function to resume task from ISR
 // <id> freertos_xresumefromisr
 #ifndef INCLUDE_xResumeFromISR
-#define INCLUDE_xResumeFromISR 0
+#define INCLUDE_xResumeFromISR 1
 #endif
 
 // <q> Include task delay utilities
@@ -262,13 +262,13 @@ to exclude the API function. */
 // <q> Include the function to get task name
 // <id> freertos_pctaskgettaskname
 #ifndef INCLUDE_pcTaskGetTaskName
-#define INCLUDE_pcTaskGetTaskName 0
+#define INCLUDE_pcTaskGetTaskName 1
 #endif
 
 // <q> Include the function to get task state
 // <id> freertos_etaskgetstate
 #ifndef INCLUDE_eTaskGetState
-#define INCLUDE_eTaskGetState 0
+#define INCLUDE_eTaskGetState 1
 #endif
 
 // <q> Include the function to clean task resources
