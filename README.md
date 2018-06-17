@@ -46,7 +46,7 @@ Outputs 1 through 5 Control n-channel MOSFETs, which switch 4.5V (5V less schott
 | PB17          | Not Mapped  | OUTPUT 3      | Low Side Switch                                      |
 | PB09          | A2          | OUTPUT 4      | Low Side Switch                                      |
 | PB08          | A1          | OUTPUT 5      | Low Side Switch                                      |
-| PB11          | SCK         | OUTPUT 6      | RAW GPIO - Used by this software a debug led signal. |
+| PB11          | SCK         | INPUT      | Zero Cross Input (EXTINT 11) |
 
 ### Servo Output
 
@@ -151,7 +151,7 @@ A SPI LCD Touchscreen controller is connected.  The controller is a [XPT2046](ht
 | PA9        | CS           | SERCOM0/2[1]  |
 | PA10       | MOSI         | SERCOM0/2[2]  |
 | PA11       | MISO         | SERCOM0/2[3]  |
-| PB10       | IRQ          |               |
+| PB10       | IRQ          | EXTINT 10     |
 
 #### LCD Touchscreen - Notes
 
@@ -219,32 +219,60 @@ flash a connected LED.  For Debugging Purposes.
 
 | SAMD21 HW          | ALLOCATION            | Note                                                      |
 | ------------------ | --------------------- | --------------------------------------------------------- |
-| NMI IRQ            | ????                      |                                                           |
-| SVC IRQ            | ????                  |                                                           |
-| SYSTICK            | System Timer          | ms Timer, used by Arduino and FreeRTOS for its scheduler. |
-| WATCHDOG           | ????                  |                                                           |  |
-| REALTIME CLOCK     | ????                  |                                                           |  |
-| EXTERNAL INTERRUPT | ????                  |                                                           |
-| USB                | Serial Comms          | Using Arduino USB Serial Library                                                          |
-| SERCOM0            | UNUSED                | Maybe can be used for SD Card Reading                     |
-| SERCOM1            | UNUSED                | Can not be used, no connected hardware                    |
-| SERCOM2            | UNUSED                | Can not be used, no connected hardware                    |
-| SERCOM3            | UNUSED                | Can not be used, no connected hardware                    |
-| SERCOM4            | UNUSED                | Can not be used, no connected hardware                    |
-| SERCOM5            | UNUSED                | Can not be used, no connected hardware                    |
-| TCC0               | ???                   | Can use this for Hardware Servo PWM, rather than software |
-| TCC1               | ???                   | Could Use this to drive OUTPUT 2                          |
-| TCC2               | ???                   |                                                           |
-| TC3                | ???                   | Could Use this to drive OUTPUT 1                          |
-| TC4                | ???                   | Could Use this to drive OUTPUT 4 & 5                      |
-| TC5                | Tone Generation       | Used by Arduino TONE Library                              |
-| TC6                | ???                   | Could Use this to drive OUTPUT 3                          |
-| TC7                | ???                   |                                                           |
-| ADC                | UNUSED                | NO ADC Functions                                          |
-| AC                 | UNUSED                | NO AC Functions                                           |
-| DAC                | UNUSED                | NO DAC Functions                                          |
-| PTC                | UNUSED                | NO PTC Functions                                          |
-| I2S                | UNUSED                | NO I2S Functions                                          |
+| GCLK0              | CPU/USB Clock  |  48Mhz  |
+| GCLK1              | GP CLK         |  8Mhz  |
+| GCLK2              | GP CLK         |  32.768Khz  |
+| GCLK3              | GP_CLK         |  1.8Mhz  |
+| GCLK4              | UNUSED  |    |
+| GCLK5              | UNUSED  |    |
+| GCLK6              | UNUSED  |    |
+| GCLK7              | UNUSED  |    |
+| NMI IRQ            | ????                      |             |
+| SVC IRQ            | ????                  |                    |
+| SYSTICK            | System Timer          | FreeRTOS system timer. |
+| WATCHDOG           | ????                  |                   |  |
+| REALTIME CLOCK     | ????                  |                 |  |
+| EXTERNAL INTERRUPT | 10                    |                  |
+| USB                | USB Communications    | Virtual Serial Port + MSC |
+| SERCOM0            | UNUSED                | SD Card Reading (Board Mod)  |
+| SERCOM1            | UNUSED                | Can not be used        |
+| SERCOM2            | UNUSED                | Can not be used      |
+| SERCOM3            | UNUSED                | Can not be used         |
+| SERCOM4            | UNUSED                | Can not be used              |
+| SERCOM5            | UNUSED                | Can not be used      |
+| TCC0               | SERVO PWM             | Hardware Servo PWM  |
+| TCC1               | ZERO CROSS TIMING     | Zero Cross HZ Measurement |
+| TCC2               | PIEZO BUZZER          | Used to drive Piezo Tone  |
+| TC3                | POSSIBLE              | 32bit CPU Cycle Timer. |
+| TC4                | POSSIBLE              | 32bit CPU Cycle Timer. |
+| TC5                | UNUSED                |                        |
+| TC6                | UNUSED                |                        |
+| TC7                | UNUSED                |                        |
+| ADC                | UNUSED                | NO ADC Functions       |
+| AC                 | UNUSED                | NO AC Functions        |
+| DAC                | UNUSED                | NO DAC Functions       |
+| PTC                | UNUSED                | NO PTC Functions       |
+| I2S                | UNUSED                | NO I2S Functions       |
+
+## OvenACE - Version Log
+
+* 1.5s Refactor and improvements
+  * This is a work in progress.
+  * Re-based on a custom build with FreeRTOS and not a Arduino build, using a modern GCC.
+  * FreeRTOS makes it easier to handle all the bit-bashed peripherals which would be unnecessary if the hardware was built properly.
+  * Renamed all .ino files other than the primary one into .cpp and added headers.  Because multiple .ino is UGLY and ends up all catted together into one big mess.  This is a structural change only and introduced no changes in behavior or functionality.
+  * Planned changes (in no particular order):
+    * A mod to use 100% of the ovens heating power during heat up when the target temp is a long way away.
+    * Configurable max power settings for the 3 elements.
+    * Fix the Servo to use hardware instead of a ISR and bit toggling
+    * Try and make the SDCard reads faster using hardware SPI.
+    * Improved Temperature reading code.  Currently the code averages over a period of 3 Seconds, which doesn't (contrary to the comments in the code) make the readings more stable, what it actually does is introduce a large delay into the ability for the oven to detect changes in the temperature.  It is also doing temperature readings as part of the Servo Code, which is ugly.
+    * Use hand tuned assembler for all the unnecessary bit bashed spi this board needs, because the hardware design is broken and can not use any hardware SPI for pretty much anything (except maybe SDCard reading).
+    * Fix a lot of the ugly direct IO code to use Atmel ASF types, when i am not using hand tuned assembler.
+    * An ability to save the onboard flash contents to the SDCard.
+    * An ability to update the onboard flash contents from the SDCard.
+
+Steven Johnson 2018 (V1.5s+)
 
 ## Reflow Wizard - Version Log
 
@@ -268,20 +296,3 @@ flash a connected LED.  For Debugging Purposes.
 Peter Easton 2017 (V1.0 to 1.4) whizoo.com
 
 **This code has branched at V1.4 and likely will not track upstream.  Various refactors that I would like to do will make that increasingly difficult.**
-
-* 1.5s Refactor and improvements
-  * This is a work in progress, as at 19 May 2018 it builds fine and runs on the hardware.  No functional changes have yet been introduced.
-  * Renamed all .ino files other than the primary one into .cpp and added headers.  Because multiple .ino is UGLY and ends up all catted together into one big mess.  This is a structural change only and introduced no changes in behavior or functionality.
-  * Planned changes (in no particular order):
-    * A mod to use 100% of the ovens heating power during heat up when the target temp is a long way away.
-    * Configurable max power settings for the 3 elements.
-    * Fix the Servo to use hardware instead of a ISR and bit toggling
-    * Try and make the SDCard reads faster using hardware SPI.
-    * Improved Temperature reading code.  Currently the code averages over a period of 3 Seconds, which doesn't (contrary to the comments in the code) make the readings more stable, what it actually does is introduce a large delay into the ability for the oven to detect changes in the temperature.  It is also doing temperature readings as part of the Servo Code, which is ugly.
-    * Use hand tuned assembler for all the unnecessary bit bashed spi this board needs, because the hardware design is broken and can not use any hardware SPI for pretty much anything (except maybe SDCard reading).
-    * Fix a lot of the ugly direct IO code to use Atmel ASF types, when i am not using hand tuned assembler.
-    * An ability to save the onboard flash contents to the SDCard.
-    * An ability to update the onboard flash contents from the SDCard.
-    * Would love to move the code off Arduino all together, and use a modern compiler, not a 4 yr old one.
-
-Steven Johnson 2018 (V1.5s+)
