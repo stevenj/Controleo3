@@ -6,7 +6,7 @@
  * to avoid loosing it when reconfiguring.
  */
 
-#include "atmel_start.h"
+#include "atmel_asf4.h"
 
 static volatile uint8_t dma_complete_flag;
 static void             M2M_DMA_0_complete_cb(void)

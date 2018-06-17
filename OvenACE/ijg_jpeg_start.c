@@ -6,7 +6,7 @@
  * to avoid loosing it when reconfiguring.
  */
 
-#include "atmel_start.h"
+#include "atmel_asf4.h"
 #include "ijg_jpeg_start.h"
 
 /* 320 x 240 Jpeg in jpegdata */
