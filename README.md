@@ -1,4 +1,4 @@
-# Controleo3 Reflow Oven Controller
+# OvenACE Oven Controller
 
 ## OVERVIEW
 
@@ -19,11 +19,17 @@ In this folder are:
 
 1. [README.md](./README.md) - this file
 2. [LICENSE](./LICENSE) - The Software License
-3. A "ReflowWizard” folder containing the Reflow Wizard software
+3. A "OvenACE” folder containing the OvenACE software
+4. A "fabricate" folder containing the build system.
+5. A "bootloader" folder containing the NEW bootloader we use.
+6. A "debug" folder containing files used when doing JTAG Debug.
+7. A "build" folder containing all the built program files.
 
 ## BUILDING
 
-This software is stand alone and requires no libraries.  Just set Arduino IDE up for ***Arduino/Genuino Zero (Native USB Port)*** and build *(verify)* ReflowWizard.ino
+This software is stand alone and requires no libraries.  
+Go to the base directory and run ./build.py to build the codebase.
+You MAY need to point the ./build.py script at where you installed your compiler.
 
 ## HARDWARE SPECIFICATION
 
