@@ -85,7 +85,7 @@ BUILD={
                     "-fstrict-volatile-bitfields",
                     "-ffunction-sections",
                     "-fdata-sections",
-                    "-Winline",
+#                    "-Winline",
                 ],
                 'CFLAGS:DEBUG' : [
                     "-Og",
