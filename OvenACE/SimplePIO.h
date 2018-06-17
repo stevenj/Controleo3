@@ -83,4 +83,7 @@ static inline void PORT_OUTPUT_HIGH(uint64_t bits) {
     if (bits != 0) { PORT_OUTSET(PB(0)) = bits; }
 }
 
+// External Interrupt convenience macros
+#define EXTINT(x)  x
+
 #endif
