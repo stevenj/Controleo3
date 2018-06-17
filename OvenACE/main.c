@@ -1,5 +1,6 @@
 #include "atmel_asf4.h"
 #include "debug_leds.h"
+#include "piezo_buzzer.h"
 #include "usb_handler.h"
 
 void vConfigureTimerForRunTimeStats(void)
@@ -22,6 +23,7 @@ void hw_init(void)
 void subsystem_init(void)
 {
 	initDebugLeds();
+	initPiezoBuzzer();
 	usb_init();
 }
 
@@ -30,6 +32,9 @@ int main(void)
 	/* Initializes MCU, drivers and middleware */
 	hw_init();
 	subsystem_init();
+
+	PlayTone(HZ_TO_FREQ(261.626));
+
 
 	/* Replace with your application code */
 	vTaskStartScheduler();
