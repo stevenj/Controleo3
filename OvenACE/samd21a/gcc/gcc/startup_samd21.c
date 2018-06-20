@@ -235,9 +235,11 @@ void Reset_Handler(void)
  */
 void Dummy_Handler(void)
 {
+#if defined(DEBUG)
     // Turn off the micro trace buffer so we don't fill it up in the infinite
     // loop below.    
     REG_MTB_MASTER = 0x00000000 + 6;
+#endif
 
 	while (1) {	}
 }
@@ -247,9 +249,11 @@ void Dummy_Handler(void)
  */
 void HardFault_Handler(void)
 {
+#if defined(DEBUG)
     // Turn off the micro trace buffer so we don't fill it up in the infinite
     // loop below.
     REG_MTB_MASTER = 0x00000000 + 6;
+#endif
 
 	while (1) {	}
 }
