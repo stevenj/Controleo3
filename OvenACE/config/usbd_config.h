@@ -6,13 +6,6 @@
 
 // ---- USB Device Stack Core Options ----
 
-// <q> High Speed Support
-// <i> Enable high speed specific descriptors support, e.g., DeviceQualifierDescriptor and OtherSpeedConfiguration Descriptor.
-// <i> High speed support require descriptors description array on start, for LS/FS and HS support in first and second place.
-// <id> usbd_hs_sp
-#ifndef CONF_USBD_HS_SP
-#define CONF_USBD_HS_SP 0
-#endif
 
 // ---- USB Device Stack Composite Options ----
 
@@ -262,20 +255,6 @@
 #define CONF_USB_COMPOSITE_CDC_ACM_DATA_BULKIN_MAXPKSZ 0x40
 #endif
 
-// <o> CDC ACM Data BULK IN Endpoint wMaxPacketSize for High Speed
-// <0x0008=> 8 bytes
-// <0x0010=> 16 bytes
-// <0x0020=> 32 bytes
-// <0x0040=> 64 bytes
-// <0x0080=> 128 bytes
-// <0x0100=> 256 bytes
-// <0x0200=> 512 bytes
-
-// <id> usb_composite_cdc_acm_data_builin_maxpksz_hs
-#ifndef CONF_USB_COMPOSITE_CDC_ACM_DATA_BULKIN_MAXPKSZ_HS
-#define CONF_USB_COMPOSITE_CDC_ACM_DATA_BULKIN_MAXPKSZ_HS 0x200
-#endif
-
 // <o> CDC ACM Data BULK OUT Endpoint Address
 // <0x01=> EndpointAddress = 0x01
 // <0x02=> EndpointAddress = 0x02
@@ -322,9 +301,6 @@
 // <i> Invoke cdcdf_acm_demo_init(buf[wMaxPacketSize]) to enable the echo demo.
 // <i> Buf is packet buffer for data receive and echo back.
 // <i> The buffer is 4 byte aligned to support DMA.
-#ifndef CONF_USB_COMPOSITE_CDC_ECHO_DEMO
-#define CONF_USB_COMPOSITE_CDC_ECHO_DEMO 1
-#endif
 
 // </e>
 

@@ -57,6 +57,14 @@ void mscdf_demo_task(void);
  */
 void usb_init(void);
 
+// Send RAW data on the serial line.
+uint32_t SerialTXData(bool debug, const void *buf, uint32_t cnt);
+// Send C Strings on the serial line.
+uint32_t SerialPrint(const void *buf);
+uint32_t SerialPrintDebug(const void *buf);
+
+void USB_printf(const char *fmt, ...);
+
 #ifdef __cplusplus
 }
 #endif // __cplusplus

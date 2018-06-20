@@ -112,13 +112,6 @@ static bool usbdc_get_dev_desc(const uint8_t ep, struct usb_req *req)
 	if (length > 0x12) {
 		length = 0x12;
 	}
-#if CONF_USBD_HS_SP
-	if (usb_d_get_speed() == USB_SPEED_HS && usbdc.desces.hs) {
-		dev_desc = usb_find_desc(usbdc.desces.hs->sod, usbdc.desces.hs->eod, USB_DT_DEVICE);
-	} else {
-		/* Obtain descriptor from FS descriptors */
-	}
-#endif
 	if (!dev_desc) {
 		dev_desc = usb_find_desc(usbdc.desces.ls_fs->sod, usbdc.desces.ls_fs->eod, USB_DT_DEVICE);
 	}
@@ -147,13 +140,6 @@ static bool usbdc_get_cfg_desc(const uint8_t ep, struct usb_req *req)
 	uint8_t  index    = req->wValue & 0x00FF;
 	bool     need_zlp = !(length & (usbdc.ctrl_size - 1));
 
-#if CONF_USBD_HS_SP
-	if (usb_d_get_speed() == USB_SPEED_HS && usbdc.desces.hs) {
-		cfg_desc = usb_find_cfg_desc(usbdc.desces.hs->sod, usbdc.desces.hs->eod, index + 1);
-	} else {
-		/* Obtain descriptor from FS descriptors */
-	}
-#endif
 	if (!cfg_desc) {
 		cfg_desc = usb_find_cfg_desc(usbdc.desces.ls_fs->sod, usbdc.desces.ls_fs->eod, index + 1);
 	}
@@ -202,76 +188,6 @@ static bool usbdc_get_str_desc(const uint8_t ep, struct usb_req *req)
 	return true;
 }
 
-#if CONF_USBD_HS_SP
-/**
- * \brief Process the GetDeviceQualifierDescriptor request
- * \param[in] ep Endpoint address.
- * \param[in] req Pointer to the request.
- * \return Operation status.
- * \retval true Request is handled OK.
- * \retval false Request not supported.
- */
-static bool usbdc_get_devqual_desc(const uint8_t ep, struct usb_req *req)
-{
-	uint8_t *dev_desc = NULL;
-	uint16_t length   = req->wLength;
-	if (length > 0x12) {
-		length = 0x12;
-	}
-	if (usb_d_get_speed() == USB_SPEED_HS && usbdc.desces.hs) {
-		dev_desc = usb_find_desc(usbdc.desces.hs->sod, usbdc.desces.hs->eod, USB_DT_DEVICE_QUALIFIER);
-	}
-	if (!dev_desc) {
-		dev_desc = usb_find_desc(usbdc.desces.ls_fs->sod, usbdc.desces.ls_fs->eod, USB_DT_DEVICE_QUALIFIER);
-	}
-	if (!dev_desc) {
-		return false;
-	}
-	if (ERR_NONE != usbdc_xfer(ep, dev_desc, length, false)) {
-		return false;
-	}
-	return true;
-}
-
-/**
- * \brief Process the GetOtherSpeedConfigurationDescriptor request
- * \param[in] ep Endpoint address.
- * \param[in] req Pointer to the request.
- * \return Operation status.
- * \retval true Request is handled OK.
- * \retval false Request not supported.
- */
-static bool usbdc_get_othspdcfg_desc(const uint8_t ep, struct usb_req *req)
-{
-	uint8_t *cfg_desc = NULL;
-	uint16_t total_len;
-	uint16_t length   = req->wLength;
-	uint8_t  index    = req->wValue & 0x00FF;
-	bool     need_zlp = !(length & (usbdc.ctrl_size - 1));
-
-	if (usb_d_get_speed() == USB_SPEED_HS && usbdc.desces.hs) {
-		cfg_desc = usb_find_othspdcfg_desc(usbdc.desces.hs->sod, usbdc.desces.hs->eod, index + 1);
-	} else {
-		/* Obtain descriptor from FS descriptors */
-	}
-	if (!cfg_desc) {
-		cfg_desc = usb_find_othspdcfg_desc(usbdc.desces.ls_fs->sod, usbdc.desces.ls_fs->eod, index + 1);
-	}
-	if (NULL == cfg_desc) {
-		return false;
-	}
-	total_len = usb_cfg_desc_total_len(cfg_desc);
-	if (length <= total_len) {
-		need_zlp = false;
-	} else {
-		length = total_len;
-	}
-	if (ERR_NONE != usbdc_xfer(ep, cfg_desc, length, need_zlp)) {
-		return false;
-	}
-	return true;
-}
-#endif
 
 /**
  * \brief Process the GetDescriptor request
@@ -289,12 +205,6 @@ static bool usbdc_get_desc_req(const uint8_t ep, struct usb_req *req)
 		return usbdc_get_dev_desc(ep, req);
 	case USB_DT_CONFIG:
 		return usbdc_get_cfg_desc(ep, req);
-#if CONF_USBD_HS_SP
-	case USB_DT_DEVICE_QUALIFIER:
-		return usbdc_get_devqual_desc(ep, req);
-	case USB_DT_OTHER_SPEED_CONFIG:
-		return usbdc_get_othspdcfg_desc(ep, req);
-#endif
 	case USB_DT_STRING:
 		return usbdc_get_str_desc(ep, req);
 	default:
@@ -472,13 +382,6 @@ static bool usbdc_set_config(uint8_t cfg_value)
 		return true;
 	}
 
-#if CONF_USBD_HS_SP
-	if (usb_d_get_speed() == USB_SPEED_HS && usbdc.desces.hs) {
-		cfg_desc = usb_find_cfg_desc(usbdc.desces.hs->sod, usbdc.desces.hs->eod, cfg_value);
-	} else {
-		/* Obtain descriptor from FS descriptors */
-	}
-#endif
 	if (!cfg_desc) {
 		cfg_desc = usb_find_cfg_desc(usbdc.desces.ls_fs->sod, usbdc.desces.ls_fs->eod, cfg_value);
 	}
@@ -532,13 +435,6 @@ static bool usbdc_set_interface(uint16_t alt_set, uint16_t ifc_id)
 	struct usbdf_driver *   func;
 	uint8_t *               ifc = NULL;
 
-#if CONF_USBD_HS_SP
-	if (usb_d_get_speed() == USB_SPEED_HS && usbdc.desces.hs) {
-		ifc = usb_find_cfg_desc(usbdc.desces.hs->sod, usbdc.desces.hs->eod, usbdc.cfg_value);
-	} else {
-		/* Obtain descriptor from FS descriptors */
-	}
-#endif
 	if (!ifc) {
 		ifc = usb_find_cfg_desc(usbdc.desces.ls_fs->sod, usbdc.desces.ls_fs->eod, usbdc.cfg_value);
 	}
@@ -925,18 +821,6 @@ int32_t usbdc_validate_desces(struct usbd_descriptors *desces)
  */
 int32_t usbdc_check_desces(struct usbdc_descriptors *desces)
 {
-#if CONF_USBD_HS_SP
-	int32_t rc;
-	if (desces->hs == NULL && desces->ls_fs == NULL) {
-		return ERR_NOT_FOUND;
-	}
-	if (desces->hs) {
-		rc = usbdc_validate_desces(desces->hs);
-		if (rc < 0) {
-			return rc;
-		}
-	}
-#endif
 	return usbdc_validate_desces(desces->ls_fs);
 }
 
@@ -951,9 +835,6 @@ int32_t usbdc_start(struct usbd_descriptors *desces)
 
 	if (desces) {
 		usbdc.desces.ls_fs = desces;
-#if CONF_USBD_HS_SP
-		usbdc.desces.hs = &desces[1];
-#endif
 	} else {
 		return ERR_BAD_DATA;
 	}

@@ -2048,6 +2048,5 @@ void _usb_d_dev_register_ep_callback(const enum usb_d_dev_ep_cb_type type, const
 */
 void USB_Handler(void)
 {
-
 	_usb_d_dev_handler();
 }

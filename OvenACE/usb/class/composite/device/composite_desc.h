@@ -87,7 +87,7 @@
 
 
 
-
+#if 0
 #define CONF_MSC_IFC_LEN 23 /* (9 + 7 * 2) */
 #define CONF_MSC_IFC_NUM 1
 #define CONF_USB_COMPOSITE_MSC_BIFCNUM (CONF_USB_COMPOSITE_CDC_ACM_DATA_BIFCNUM + 1)
@@ -102,9 +102,16 @@
 
 #define CONF_USB_COMPOSITE_TOTAL_LEN                                                                                   \
 	(USB_CONFIG_DESC_LEN + CONF_CDC_ACM_IFC_LEN + CONF_MSC_IFC_LEN)
-
 #define CONF_USB_COMPOSITE_IFC_NUM                                                                                     \
 	(CONF_CDC_ACM_IFC_NUM + CONF_MSC_IFC_NUM)
+
+#else
+#define CONF_USB_COMPOSITE_TOTAL_LEN                                                                                   \
+	(USB_CONFIG_DESC_LEN + CONF_CDC_ACM_IFC_LEN)
+#define CONF_USB_COMPOSITE_IFC_NUM                                                                                     \
+	(CONF_CDC_ACM_IFC_NUM)
+#endif
+
 
 #define COMPOSITE_DEV_DESC                                                                                             \
 	USB_DEV_DESC_BYTES(CONF_USB_COMPOSITE_BCDUSB,                                                                      \
@@ -140,6 +147,7 @@
 	                           CONF_USB_COMPOSITE_BMATTRI,                                                             \
 	                           CONF_USB_COMPOSITE_BMAXPOWER)
 
+#if 0
 #define COMPOSITE_IFACE_DESCES                                                                                         \
 	CONF_CDC_ACM_IFC_DESC                                                                                              \
 	CONF_MSC_IFC_DESC
@@ -147,6 +155,13 @@
 #define COMPOSITE_IFACE_DESCES_HS                                                                                      \
 	CONF_CDC_ACM_IFC_DESC_HS                                                                                           \
 	CONF_MSC_IFC_DESC_HS
+#else
+#define COMPOSITE_IFACE_DESCES                                                                                         \
+	CONF_CDC_ACM_IFC_DESC                                                                                              
+
+#define COMPOSITE_IFACE_DESCES_HS                                                                                      \
+	CONF_CDC_ACM_IFC_DESC_HS                                                                                           
+#endif
 
 #define COMPOSITE_STR_DESCESS                                                                                          \
 	CONF_USB_COMPOSITE_LANGID_DESC                                                                                     \
