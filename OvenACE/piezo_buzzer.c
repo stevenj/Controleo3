@@ -49,9 +49,9 @@ void initPiezoBuzzer(void)
     // 1. Enable the TCC bus clock (CLK_TCCx_APB).
     BUZZER_APBCMASK(PIEZO_TCC) = true;
 
-    /* Set GCLK_GEN0 as source for GCLK_ID_SERCOMx_CORE */
+    /* Set GCLK as source for TCC */
     GCLK_CLKCTRL_Type clkctrl = {0};
-    clkctrl.bit.GEN   = 3; // GP Clock (1.8Mhz)
+    clkctrl.bit.GEN   = PIEZO_GCLK; // GP Clock (1.8Mhz)
     clkctrl.bit.CLKEN = true;
     clkctrl.bit.ID    = GCLK_CLKCTRL_ID_TCC2_TC3_Val;
     GCLK->CLKCTRL     = clkctrl;
@@ -60,8 +60,8 @@ void initPiezoBuzzer(void)
     TCC_CTRLA_Type tccctrl_a = {0};
     tccctrl_a.bit.SWRST = true;
     TCC(PIEZO_TCC)->CTRLA = tccctrl_a;
-    while ((TCC(PIEZO_TCC)->CTRLA.bit.SWRST) == 1) {}
     while ((TCC(PIEZO_TCC)->SYNCBUSY.bit.SWRST) == 1) {}
+    while ((TCC(PIEZO_TCC)->CTRLA.bit.SWRST) == 1) {}
 
     // 3. Set waveform Generation Mode.
     // Note: Default Waveform mode is to toggle the output on overflow, 
