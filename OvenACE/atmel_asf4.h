@@ -6,8 +6,7 @@ extern "C" {
 #endif
 
 #include "driver_init.h"
-#include "rtos_start.h"
-#include "ijg_jpeg_start.h"
+#include "rtos_support.h"
 #include "dma_m2m_main.h"
 
 
