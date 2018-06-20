@@ -37,8 +37,17 @@ extern uint32_t _srelocate;
 extern uint32_t _erelocate;
 extern uint32_t _szero;
 extern uint32_t _ezero;
+extern uint32_t _sheap;
+extern uint32_t _eheap;
 extern uint32_t _sstack;
 extern uint32_t _estack;
+
+
+#if defined(DEBUG)
+    // Create a Trace Buffer
+    #define TRACE_BUFFER_SIZE 256
+    __attribute__((__aligned__(TRACE_BUFFER_SIZE * sizeof(uint32_t)))) uint32_t mtb[TRACE_BUFFER_SIZE];
+#endif
 
 /** \cond DOXYGEN_SHOULD_SKIP_THIS */
 int main(void);
@@ -51,7 +60,7 @@ void Dummy_Handler(void);
 
 /* Cortex-M0+ core handlers */
 void NonMaskableInt_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
-void HardFault_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
+void HardFault_Handler(void) __attribute__((weak)); // Don't make it the Dummy Handler.
 void SVCall_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
 void PendSV_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
 void SysTick_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
@@ -64,44 +73,26 @@ void RTC_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
 void EIC_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
 void NVMCTRL_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
 void DMAC_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
-#ifdef ID_USB
 void USB_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
-#endif
 void EVSYS_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
 void SERCOM0_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
 void SERCOM1_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
 void SERCOM2_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
 void SERCOM3_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
-#ifdef ID_SERCOM4
 void SERCOM4_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
-#endif
-#ifdef ID_SERCOM5
 void SERCOM5_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
-#endif
 void TCC0_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
 void TCC1_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
 void TCC2_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
 void TC3_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
 void TC4_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
 void TC5_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
-#ifdef ID_TC6
 void TC6_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
-#endif
-#ifdef ID_TC7
 void TC7_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
-#endif
-#ifdef ID_ADC
 void ADC_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
-#endif
-#ifdef ID_AC
 void AC_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
-#endif
-#ifdef ID_DAC
 void DAC_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
-#endif
-#ifdef ID_PTC
 void PTC_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
-#endif
 void I2S_Handler(void) __attribute__((weak, alias("Dummy_Handler")));
 
 /* Exception Table */
@@ -134,64 +125,28 @@ __attribute__((section(".vectors"))) const DeviceVectors exception_table = {
     .pfnEIC_Handler     = (void *)EIC_Handler,     /*  4 External Interrupt Controller */
     .pfnNVMCTRL_Handler = (void *)NVMCTRL_Handler, /*  5 Non-Volatile Memory Controller */
     .pfnDMAC_Handler    = (void *)DMAC_Handler,    /*  6 Direct Memory Access Controller */
-#ifdef ID_USB
-    .pfnUSB_Handler = (void *)USB_Handler, /*  7 Universal Serial Bus */
-#else
-    .pvReserved7  = (void *)(0UL), /*  7 Reserved */
-#endif
+    .pfnUSB_Handler     = (void *)USB_Handler,     /*  7 Universal Serial Bus */
     .pfnEVSYS_Handler   = (void *)EVSYS_Handler,   /*  8 Event System Interface */
     .pfnSERCOM0_Handler = (void *)SERCOM0_Handler, /*  9 Serial Communication Interface 0 */
     .pfnSERCOM1_Handler = (void *)SERCOM1_Handler, /* 10 Serial Communication Interface 1 */
     .pfnSERCOM2_Handler = (void *)SERCOM2_Handler, /* 11 Serial Communication Interface 2 */
     .pfnSERCOM3_Handler = (void *)SERCOM3_Handler, /* 12 Serial Communication Interface 3 */
-#ifdef ID_SERCOM4
     .pfnSERCOM4_Handler = (void *)SERCOM4_Handler, /* 13 Serial Communication Interface 4 */
-#else
-    .pvReserved13 = (void *)(0UL), /* 13 Reserved */
-#endif
-#ifdef ID_SERCOM5
     .pfnSERCOM5_Handler = (void *)SERCOM5_Handler, /* 14 Serial Communication Interface 5 */
-#else
-    .pvReserved14 = (void *)(0UL), /* 14 Reserved */
-#endif
-    .pfnTCC0_Handler = (void *)TCC0_Handler, /* 15 Timer Counter Control 0 */
-    .pfnTCC1_Handler = (void *)TCC1_Handler, /* 16 Timer Counter Control 1 */
-    .pfnTCC2_Handler = (void *)TCC2_Handler, /* 17 Timer Counter Control 2 */
-    .pfnTC3_Handler  = (void *)TC3_Handler,  /* 18 Basic Timer Counter 0 */
-    .pfnTC4_Handler  = (void *)TC4_Handler,  /* 19 Basic Timer Counter 1 */
-    .pfnTC5_Handler  = (void *)TC5_Handler,  /* 20 Basic Timer Counter 2 */
-#ifdef ID_TC6
-    .pfnTC6_Handler = (void *)TC6_Handler, /* 21 Basic Timer Counter 3 */
-#else
-    .pvReserved21 = (void *)(0UL), /* 21 Reserved */
-#endif
-#ifdef ID_TC7
-    .pfnTC7_Handler = (void *)TC7_Handler, /* 22 Basic Timer Counter 4 */
-#else
-    .pvReserved22 = (void *)(0UL), /* 22 Reserved */
-#endif
-#ifdef ID_ADC
-    .pfnADC_Handler = (void *)ADC_Handler, /* 23 Analog Digital Converter */
-#else
-    .pvReserved23 = (void *)(0UL), /* 23 Reserved */
-#endif
-#ifdef ID_AC
-    .pfnAC_Handler = (void *)AC_Handler, /* 24 Analog Comparators */
-#else
-    .pvReserved24 = (void *)(0UL), /* 24 Reserved */
-#endif
-#ifdef ID_DAC
-    .pfnDAC_Handler = (void *)DAC_Handler, /* 25 Digital Analog Converter */
-#else
-    .pvReserved25 = (void *)(0UL), /* 25 Reserved */
-#endif
-#ifdef ID_PTC
-    .pfnPTC_Handler = (void *)PTC_Handler, /* 26 Peripheral Touch Controller */
-#else
-    .pvReserved26 = (void *)(0UL), /* 26 Reserved */
-#endif
-    .pfnI2S_Handler = (void *)I2S_Handler, /* 27 Inter-IC Sound Interface */
-    .pvReserved28   = (void *)(0UL)        /* 28 Reserved */
+    .pfnTCC0_Handler    = (void *)TCC0_Handler,    /* 15 Timer Counter Control 0 */
+    .pfnTCC1_Handler    = (void *)TCC1_Handler,    /* 16 Timer Counter Control 1 */
+    .pfnTCC2_Handler    = (void *)TCC2_Handler,    /* 17 Timer Counter Control 2 */
+    .pfnTC3_Handler     = (void *)TC3_Handler,     /* 18 Basic Timer Counter 0 */
+    .pfnTC4_Handler     = (void *)TC4_Handler,     /* 19 Basic Timer Counter 1 */
+    .pfnTC5_Handler     = (void *)TC5_Handler,     /* 20 Basic Timer Counter 2 */
+    .pfnTC6_Handler     = (void *)TC6_Handler,     /* 21 Basic Timer Counter 3 */
+    .pfnTC7_Handler     = (void *)TC7_Handler,     /* 22 Basic Timer Counter 4 */
+    .pfnADC_Handler     = (void *)ADC_Handler,     /* 23 Analog Digital Converter */
+    .pfnAC_Handler      = (void *)AC_Handler,      /* 24 Analog Comparators */
+    .pfnDAC_Handler     = (void *)DAC_Handler,     /* 25 Digital Analog Converter */
+    .pfnPTC_Handler     = (void *)PTC_Handler,     /* 26 Peripheral Touch Controller */
+    .pfnI2S_Handler     = (void *)I2S_Handler,     /* 27 Inter-IC Sound Interface */
+    .pvReserved28       = (void *)(0UL)            /* 28 Reserved */
 };
 
 /**
@@ -202,7 +157,7 @@ void Reset_Handler(void)
 {
 	uint32_t *pSrc, *pDest;
 
-	/* Initialize the relocate segment */
+	/* Initialize RAM Data by copying values from Flash to RAM */
 	pSrc  = &_etext;
 	pDest = &_srelocate;
 
@@ -216,6 +171,30 @@ void Reset_Handler(void)
 	for (pDest = &_szero; pDest < &_ezero;) {
 		*pDest++ = 0;
 	}
+
+    // Clear the HEAP (Not with ZERO)
+	pSrc  = &_sheap;
+	pDest = &_eheap;
+    while (pSrc < pDest) {
+        *pSrc++ = 0x50414548; // String "HEAP"
+    }
+
+
+    #define IRQ_STACK_EVEN_FILL (0x53515249)
+    #define IRQ_STACK_ODD_FILL (0x4b434154)
+
+    // Fill the Boot Stack with 0x7e57ab1e and 0x7e117a1e
+    // "IRQSTACK" (Visible in a memory hex dump)
+    // So we can detect maximum IRQ stack usage and overflow.
+	pSrc  = &_sstack;
+	pDest = &_estack;
+    while (pSrc < pDest) {
+        if (((uint32_t)pSrc & 0x4) == 0) {
+            *pSrc++ = IRQ_STACK_EVEN_FILL;
+        } else {
+            *pSrc++ = IRQ_STACK_ODD_FILL;
+        }
+    }
 
 	/* Set the vector table base address */
 	pSrc      = (uint32_t *)&_sfixed;
@@ -237,6 +216,12 @@ void Reset_Handler(void)
 	/* Initialize the C library */
 	__libc_init_array();
 
+#if defined(DEBUG)
+    REG_MTB_POSITION = ((uint32_t) (mtb - REG_MTB_BASE)) & 0xFFFFFFF8;
+    REG_MTB_FLOW = ((uint32_t) mtb + TRACE_BUFFER_SIZE * sizeof(uint32_t)) & 0xFFFFFFF8;
+    REG_MTB_MASTER = 0x80000000 + 6;
+#endif
+
 	/* Branch to main function */
 	main();
 
@@ -250,6 +235,21 @@ void Reset_Handler(void)
  */
 void Dummy_Handler(void)
 {
-	while (1) {
-	}
+    // Turn off the micro trace buffer so we don't fill it up in the infinite
+    // loop below.    
+    REG_MTB_MASTER = 0x00000000 + 6;
+
+	while (1) {	}
+}
+
+/**
+ * \brief Default interrupt handler for unused IRQs.
+ */
+void HardFault_Handler(void)
+{
+    // Turn off the micro trace buffer so we don't fill it up in the infinite
+    // loop below.
+    REG_MTB_MASTER = 0x00000000 + 6;
+
+	while (1) {	}
 }

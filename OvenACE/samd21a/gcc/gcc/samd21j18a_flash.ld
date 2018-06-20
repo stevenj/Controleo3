@@ -40,8 +40,9 @@ MEMORY
   ram      (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00008000
 }
 
-/* The stack size used by the application. NOTE: you need to adjust according to your application. */
-STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : DEFINED(__stack_size__) ? __stack_size__ : 0x2000;
+/* The stack size used by the application startup and IRQ handlers. */
+/* RTOS Tasks have stack allocated in the heap. */
+STACK_SIZE = 1024;
 
 /* Section Definitions */
 SECTIONS
@@ -129,7 +130,28 @@ SECTIONS
         _ezero = .;
     } > ram
 
-    /* stack section */
+    /* HEAP is ALL data between END of .bss and BOTTOM of stack. */
+    .heap (NOLOAD) :
+    {
+        . = ALIGN(4);
+        _sheap = .;
+        ucHeap = .; /* FreeRTOS symbol for the start of the heap */
+        /* Calculate the size of the HEAP from the end of BSS to start of STACK */
+        . = . + (LENGTH(ram) - STACK_SIZE) - (. - ORIGIN(ram));
+        . = ALIGN(4);
+        _eheap = .;
+        _hsize = _eheap - _sheap;
+    } > ram
+
+    /* stack section - Used for Startup and then IRQ. */
+    /* From the ARM Device Users Guide: 
+     * The processor uses a full descending stack. This means the stack 
+     * pointer indicates the last stacked item on the stack memory. When the
+     * processor pushes a new item onto the stack, it decrements the stack 
+     * pointer and then writes the item to the new memory location.
+     * This means for US, that _estack SHOULD be the word just past the end of RAM.
+     * Then the first item stored on the stack will be AT The top word of RAM.
+     */
     .stack (NOLOAD):
     {
         . = ALIGN(8);

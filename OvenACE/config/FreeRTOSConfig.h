@@ -41,7 +41,15 @@ void assert_triggered(const char *file, uint32_t line);
 // <i> Default: 2400
 // <id> freertos_total_heap_size
 #ifndef configTOTAL_HEAP_SIZE
-#define configTOTAL_HEAP_SIZE ((size_t)(2400))
+//#define configTOTAL_HEAP_SIZE ((size_t)(8192))
+extern uint32_t _sheap;
+extern uint32_t _eheap;
+#define configTOTAL_HEAP_SIZE ((uint32_t)(&_eheap-&_sheap))
+#define ucHeap (&_sheap)
+#endif
+
+#ifndef configAPPLICATION_ALLOCATED_HEAP
+#define configAPPLICATION_ALLOCATED_HEAP 1
 #endif
 
 // <q> Enable mutex
@@ -91,7 +99,11 @@ void assert_triggered(const char *file, uint32_t line);
 // <q> Check stack overflow
 // <id> freertos_check_for_stack_overflow
 #ifndef configCHECK_FOR_STACK_OVERFLOW
-#define configCHECK_FOR_STACK_OVERFLOW 0
+	#if defined(DEBUG)
+		#define configCHECK_FOR_STACK_OVERFLOW 2
+	#else
+		#define configCHECK_FOR_STACK_OVERFLOW 0
+	#endif
 #endif
 
 // <q> Use maclloc failed hook
@@ -190,7 +202,7 @@ void assert_triggered(const char *file, uint32_t line);
 
 #define configPRIO_BITS 3
 
-#define configMAX_TASK_NAME_LEN (8)
+#define configMAX_TASK_NAME_LEN (9)
 #define configIDLE_SHOULD_YIELD 1
 #define configQUEUE_REGISTRY_SIZE 0
 #define configUSE_QUEUE_SETS 1
