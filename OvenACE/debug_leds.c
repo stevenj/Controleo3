@@ -9,8 +9,10 @@
 
 #include "SimplePIO.h"
 #include "HWPinAssignments.h"
+#include "usb_handler.h"
+#include "printf-stdarg.h"
 
-#define DEBUGTASK_STACK_SIZE (256 / sizeof(portSTACK_TYPE))
+#define DEBUGTASK_STACK_SIZE (128)
 #define DEBUGTASK_PRIORITY   (tskIDLE_PRIORITY + 1)
 
 static TaskHandle_t      xDebugLedTask;
@@ -45,31 +47,43 @@ static uint32_t    dbgcnt;
 static void DebugLed_task(void *p)
 {
 	(void)p; // Unused
+	int cnt = 0;
+	int mcnt = 0;
 
 	while (1) {
   	  #ifdef DEBUG_LED_RED
 		if (HBRepeat > 0) {
 			HBRepeat -= 1;
-			PORT_OUTTGL(DEBUG_LED_RED);
+			PORT_OUTTGL(DEBUG_LED_RED) = PBITRAW(DEBUG_LED_RED);
 		} else {
-			PORT_OUTSET(DEBUG_LED_RED);
+			PORT_OUTSET(DEBUG_LED_RED) = PBITRAW(DEBUG_LED_RED);
 		}
 	  #endif	
 	  #ifdef DEBUG_LED_GREEN
 		if (CurrentDebugState.repeats != 0) {
 			dbgcnt++;
 			if (dbgcnt == 1) {
-				PORT_OUTSET(DEBUG_LED_GREEN);
+				PORT_OUTSET(DEBUG_LED_GREEN) = PBITRAW(DEBUG_LED_GREEN);
 			} else if (dbgcnt == CurrentDebugState.on_time) {
-				PORT_OUTCLR(DEBUG_LED_GREEN);
+				PORT_OUTCLR(DEBUG_LED_GREEN) = PBITRAW(DEBUG_LED_GREEN);
 			} else if (dbgcnt == CurrentDebugState.on_time + CurrentDebugState.off_time) {
 				CurrentDebugState.repeats--;
 				dbgcnt = 0;
 			}
 		}
-		PORT_OUTTGL(DEBUG_LED_GREEN);
 	  #endif	
 		os_sleep(pdMS_TO_TICKS(100));
+
+		cnt++;
+		if (cnt == 100) {
+			printf("Message %d 234567 20 234567 30 234567 40 234567 50 234567 60 234567 70 234567 80\n", mcnt);
+			mcnt++;
+		} else if (cnt == 200) {
+			printfD("Message %d ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$^&*()-={}|[];':,./<>?`~\n", mcnt);
+			mcnt++;
+			cnt = 0;
+		}
+
 	}
 }
 
@@ -119,7 +133,7 @@ void initDebugLeds(void)
 
 	// Create task which handles flashing the leds
 	xTaskCreate(
-        DebugLed_task, "Debug Led Handler", 
+        DebugLed_task, "DBUG Led", 
         DEBUGTASK_STACK_SIZE, NULL, 
-        DEBUGTASK_PRIORITY, xDebugLedTask);
+        DEBUGTASK_PRIORITY, &xDebugLedTask);
 }
