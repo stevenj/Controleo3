@@ -16,7 +16,12 @@ extern "C" {
 #define GCLK2_HZ (32768)
 #define GCLK3_HZ (1800000)
 // GCLK 4-7 UNUSED
+#define GCLK_HZ(x) (GCLK ## x ## _HZ)
 
+/* ********* CPU CYCLE TIMER ******************* */
+#define CPU_CYCLE_TC_MASTER 4
+#define CPU_CYCLE_TC_SLAVE  3
+#define CPU_CYCLE_TC_GCLK   0
 
 /* ********* DEBUG LEDS ******************* */
 #ifndef DEBUG  // Only defined when not a DEBUG build
@@ -31,6 +36,7 @@ extern "C" {
 /* ********* PIEZO BUZZER ******************* */
 #define PIEZO_BUZZER PA(12)
 #define PIEZO_TCC    2
+#define PIEZO_GCLK   3
 
 /* ********* RELAY OUTPUTS ******************* */
 #define RELAY_OUTPUT1 PA(15)
