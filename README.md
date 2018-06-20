@@ -249,9 +249,9 @@ flash a connected LED.  For Debugging Purposes.
 | TCC0               | SERVO PWM             | Hardware Servo PWM  |
 | TCC1               | ZERO CROSS TIMING     | Zero Cross HZ Measurement |
 | TCC2               | PIEZO BUZZER          | Used to drive Piezo Tone  |
-| TC3                | POSSIBLE              | 32bit CPU Cycle Timer. |
-| TC4                | POSSIBLE              | 32bit CPU Cycle Timer. |
-| TC5                | UNUSED                |                        |
+| TC3                | UNUSED                |  |
+| TC4                | CPU CYCLE COUNTER     | 32bit CPU Cycle Timer. (MASTER)|
+| TC5                | CPU CYCLE COUNTER     | 32bit CPU Cycle Timer. (SLAVE)|
 | TC6                | UNUSED                |                        |
 | TC7                | UNUSED                |                        |
 | ADC                | UNUSED                | NO ADC Functions       |
