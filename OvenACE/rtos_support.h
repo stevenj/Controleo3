@@ -17,7 +17,15 @@ extern "C" {
 #include <semphr.h>
 #include <hal_rtos.h>
 
-void FREERTOS_V1000_0_example(void);
+// Read RAW CPU HZ Counter.
+// AT 48Mhz this will wrap in about 89 Seconds of run time.
+#define CPU_HZ_COUNTER() (TC4->COUNT32.COUNT.reg)
+
+// Returns the CPU HZ / 256 which @ 48Mhz gives about 6 Hours of
+// Runtime.
+uint32_t vGetRunTimeCounterValue(void);
+
+void vTaskPrintRunTimeStats(void);
 
 #ifdef __cplusplus
 }
