@@ -3,28 +3,18 @@
 #include "piezo_buzzer.h"
 #include "usb_handler.h"
 
-void vConfigureTimerForRunTimeStats(void)
-{
-}
-
-uint32_t vGetRunTimeCounterValue(void)
-{
-	return 1;
-}
 
 void hw_init(void) 
 {
 	system_init();
-	usb_init();
 	dma_memory_init();
-
+	usb_init();
 }
 
 void subsystem_init(void)
 {
 	initDebugLeds();
-	initPiezoBuzzer();
-	usb_init();
+	//initPiezoBuzzer();
 }
 
 int main(void)
@@ -33,7 +23,7 @@ int main(void)
 	hw_init();
 	subsystem_init();
 
-	PlayTone(HZ_TO_FREQ(261.626));
+	//PlayTone(HZ_TO_FREQ(261.626));
 
 
 	/* Replace with your application code */
