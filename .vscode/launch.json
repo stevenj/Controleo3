@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
         {
             "cwd": "${workspaceRoot}",
             "executable": "./build/debug/ARM/SAMD21J18A/OvenACE.elf",
@@ -16,7 +17,10 @@
             "configFiles": [
                 "./debug/openocd.cfg"
             ],
-            "showDevDebugOutput": false
+            "debuggerArgs": [
+                "-x","debug/micro-trace-buffer.py"
+            ],
+            "showDevDebugOutput": false,
         },
         {
             "cwd": "${workspaceRoot}",

@@ -89,7 +89,12 @@
         "slist": "c",
         "initializer_list": "c",
         "valarray": "c",
-        "*.ipp": "c"
+        "*.ipp": "c",
+        "hash_map": "c",
+        "hash_set": "c",
+        "bitset": "c",
+        "chrono": "c",
+        "algorithm": "c"
     },
     "python.pythonPath": "/usr/bin/python3",
     "git.ignoreLimitWarning": true,
