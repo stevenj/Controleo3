@@ -26,6 +26,7 @@ extern "C" {
 uint32_t vGetRunTimeCounterValue(void);
 
 void vTaskPrintRunTimeStats(void);
+void PrintMemoryStats(void);
 
 #ifdef __cplusplus
 }

@@ -101,7 +101,7 @@ uint32_t vGetRunTimeCounterValue(void)
 	return ((this_hz >> 8) | (overflow_hz < 24));
 }
 
-const char *TASK_STATE_NAMES[] = {
+const char * const TASK_STATE_NAMES[] = {
 	[eRunning]   = "RUNNING",
 	[eReady]     = "READY",
 	[eBlocked]   = "BLOCKED",
@@ -110,11 +110,16 @@ const char *TASK_STATE_NAMES[] = {
 	[eInvalid]   = "INVALID"
 };
 
+const char TaskTableHeader[]    = "  NAME     : NUMBER   : STATE     : PRIO  : RUNTIME              : STACK      : UNUSED STACK\n";
+const char TaskTableUnderline[] = "-----------+----------+-----------+-------+----------------------+------------+--------------\n";
+const char TaskTableFormat[]    = "  %8s : %08X : %9s : %2d/%2d : %10u(%3u.%03u) : 0x%08X : %10u \n";
+
 void vTaskPrintRunTimeStats(void)
 {
 	TaskStatus_t *       pxTaskStatusArray;
 	volatile UBaseType_t uxArraySize, x;
 	uint32_t             ulTotalTime;
+	uint64_t             percent1000;
 
 #if (configUSE_TRACE_FACILITY != 1)
 	{
@@ -135,9 +140,8 @@ void vTaskPrintRunTimeStats(void)
 		/* Generate the (binary) data. */
 		uxArraySize = uxTaskGetSystemState(pxTaskStatusArray, uxArraySize, &ulTotalTime);
 
-		printfD("TOTAL TASKS = %d\n", (int)uxArraySize);
-		printfD("  NAME     : NUMBER   : STATE     : \n");
-		printfD("-----------+----------+-----------+ \n");
+		printfD(TaskTableHeader);
+		printfD(TaskTableUnderline);
 
 		/* Create a human readable table from the binary data. */
 		for (x = 0; x < uxArraySize; x++) {
@@ -146,16 +150,97 @@ void vTaskPrintRunTimeStats(void)
 			ulTotalRunTimeDiv100 has already been divided by 100. */
 			//ulStatsAsPercentage = pxTaskStatusArray[x].ulRunTimeCounter / ulTotalTime;
 
-			printfD("  %8s : %08X : %9s : %3d  \n",
+			// Percentage of time to 3 fixed places.
+			percent1000 = pxTaskStatusArray[x].ulRunTimeCounter;
+			percent1000 *= 100000;
+			percent1000 /= ulTotalTime;
+
+			printfD(TaskTableFormat,
 						pxTaskStatusArray[x].pcTaskName,
 						(unsigned int)pxTaskStatusArray[x].xTaskNumber,
 						TASK_STATE_NAMES[pxTaskStatusArray[x].eCurrentState],
-						(int)pxTaskStatusArray[x].uxCurrentPriority
+						(int)pxTaskStatusArray[x].uxCurrentPriority,
+						(int)pxTaskStatusArray[x].uxBasePriority,
+						(unsigned int)pxTaskStatusArray[x].ulRunTimeCounter,
+						(unsigned int)percent1000/1000,
+						(unsigned int)percent1000%1000,
+						(unsigned int)pxTaskStatusArray[x].pxStackBase,
+						(unsigned int)pxTaskStatusArray[x].usStackHighWaterMark
 						);
 		}
+		printfD(TaskTableUnderline);
+
+		printfD(TaskTableFormat,
+					"TOTALS",
+					(unsigned int)uxArraySize,
+					"",
+					0,
+					0,
+					(unsigned int)ulTotalTime,
+					100,0, //%
+					0,
+					0
+					);
 
 		/* Free the array again.  NOTE!  If configSUPPORT_DYNAMIC_ALLOCATION
 		is 0 then vPortFree() will be #defined to nothing. */
 		vPortFree(pxTaskStatusArray);
+
 	}
+}
+
+// Linker Symbols for memory statistics
+extern uint32_t _srelocate;
+extern uint32_t _ebss;
+extern uint32_t _sheap;
+extern uint32_t _eheap;
+extern uint32_t _sstack;
+extern uint32_t _estack;
+
+#define IRQ_STACK_EVEN_FILL (0x53515249)
+#define IRQ_STACK_ODD_FILL (0x4b434154)
+
+static uint32_t IRQStackFree(void)
+{
+	uint32_t *start = &_sstack;
+	uint32_t *end   = &_estack;
+
+	while (start != end) {
+		if (((uint32_t)start & 0x4) == 0) {
+			if (*start != IRQ_STACK_EVEN_FILL) {
+				break;
+			}
+		} else {
+			if (*start != IRQ_STACK_ODD_FILL) {
+				break;
+			}
+		}
+		start++;
+	}
+
+	return (uint32_t)(start - &_sstack);
+}
+
+void PrintMemoryStats(void)
+{
+	printfD("  ALLOCATED DATA :\n");
+	printfD("    Start    = 0x%08X\n", (unsigned)&_srelocate);
+	printfD("    End      = 0x%08X\n", (unsigned)&_ebss);
+	printfD("    Size     = %u\n"    , (unsigned)(&_ebss - &_srelocate));
+	printfD("\n");
+
+	printfD("  HEAP :\n");
+	printfD("    Start    = 0x%08X\n", (unsigned)&_sheap);
+	printfD("    End      = 0x%08X\n", (unsigned)&_eheap);
+	printfD("    Size     = %u\n"    , (unsigned)(&_eheap - &_sheap));
+	printfD("    Free     = %u\n"    , xPortGetFreeHeapSize());
+	printfD("    Min Free = %u\n"    , xPortGetMinimumEverFreeHeapSize());
+	printfD("\n");
+
+	printfD("  IRQ STACK :\n");
+	printfD("    Start    = 0x%08X\n", (unsigned)&_sstack);
+	printfD("    End      = 0x%08X\n", (unsigned)&_estack);
+	printfD("    Top      = 0x%08X\n", (unsigned)__get_MSP());
+	printfD("    Size     = %u\n"    , (unsigned)(&_estack - &_sstack));
+	printfD("    Free     = %u\n"    , (unsigned)IRQStackFree());
 }
