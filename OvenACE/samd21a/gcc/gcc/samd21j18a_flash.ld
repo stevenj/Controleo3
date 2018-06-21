@@ -140,7 +140,6 @@ SECTIONS
         . = . + (LENGTH(ram) - STACK_SIZE) - (. - ORIGIN(ram));
         . = ALIGN(4);
         _eheap = .;
-        _hsize = _eheap - _sheap;
     } > ram
 
     /* stack section - Used for Startup and then IRQ. */
