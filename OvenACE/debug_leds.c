@@ -11,6 +11,7 @@
 #include "HWPinAssignments.h"
 #include "usb_handler.h"
 #include "printf-stdarg.h"
+#include "stdio.h"
 
 #define DEBUGTASK_STACK_SIZE (128)
 #define DEBUGTASK_PRIORITY   (tskIDLE_PRIORITY + 1)
