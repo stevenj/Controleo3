@@ -147,9 +147,14 @@ void vPortStartFirstTask(void)
 	/* The MSP stack is not reset as, unlike on M3/4 parts, there is no vector
 	table offset register that can be used to locate the initial stack value.
 	Not all M0 parts have the application vector table at address 0. */
+	/* SJ: So instead I get the end of the stack from the link file, like a normal human does. */
 	__asm volatile(
 	    "	.syntax unified				\n"
 	    "	ldr  r2, pxCurrentTCBConst2	\n" /* Obtain location of pxCurrentTCB. */
+		/* SJ Stack Reset Changes Here: */
+		"   ldr  r0, [r2,4]             \n" /* Get MSP Stack Top */
+	    "	msr  msp, r0			    \n" /* Reset the IRQ stack back to the top.*/
+		/* SJ Stack Reset Changes END Here: */
 	    "	ldr  r3, [r2]				\n"
 	    "	ldr  r0, [r3]				\n"     /* The first item in pxCurrentTCB is the task top of stack. */
 	    "	adds r0, #32					\n" /* Discard everything up to r0. */
@@ -165,7 +170,10 @@ void vPortStartFirstTask(void)
 	    "	bx   r3						\n"     /* Finally, jump to the user defined task code. */
 	    "								\n"
 	    "	.align 4					\n"
-	    "pxCurrentTCBConst2: .word pxCurrentTCB	  ");
+	    "pxCurrentTCBConst2: .word pxCurrentTCB\n"
+		/* SJ Stack Reset Changes Here: */
+		"pxStackTop:		 .word _estack\n");
+		/* SJ Stack Reset Changes END Here: */
 }
 /*-----------------------------------------------------------*/
 
