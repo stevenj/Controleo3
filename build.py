@@ -85,6 +85,7 @@ BUILD={
                     "-fstrict-volatile-bitfields",
                     "-ffunction-sections",
                     "-fdata-sections",
+                    "-ffreestanding",
 #                    "-Winline",
                 ],
                 'CFLAGS:DEBUG' : [
@@ -152,12 +153,12 @@ BUILD={
                 'CFLAGS' : [ # Passed to GCC when linking.
                     "-mcpu="+TARGET['CPU'],
                     "-mtune="+TARGET['CPU'],
+                    "--specs=nano.specs",
                 ],
                 'CFLAGS:DEBUG' : [
                     "-ggdb3",
                 ],
                 'CFLAGS:OPT-SIZE' : [
-                    "--specs=nano.specs",
                 ],
                 'LDFLAGS' : [ # These are passed to the linker (by GCC), using "-Wl"
                     "-T","OvenACE/samd21a/gcc/gcc/samd21j18a_flash.ld",
