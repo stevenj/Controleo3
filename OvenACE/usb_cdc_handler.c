@@ -17,6 +17,8 @@
 
 static TaskHandle_t      xUSBCDC_TX_Task;
 static TaskHandle_t      xUSBCDC_RX_Task;
+static TaskHandle_t      TX_Task_Waiting;
+
 
 static SemaphoreHandle_t xprintfMutex = NULL;
 static bool cdc_connected = false;
@@ -33,29 +35,35 @@ static struct usbd_descriptors multi_desc[] = {
 /** Ctrl endpoint buffer */
 static uint8_t ctrl_buffer[64];
 
-static volatile int bulk_ins = 0;
-static volatile uint8_t       in_eps[16];
-static volatile enum usb_xfer_code in_rcs[16];
-static volatile uint32_t      in_cnt[16];
-
 // Buffer Size must be 256. (exploits the natural wrapping of a byte).
 #define TX_BUFFER_SIZE (256)
 static uint8_t tx_buffer[TX_BUFFER_SIZE];
 static uint8_t tx_head = 0;
 static uint8_t tx_tail = 0;
 static bool    tx_idle = true;
+
+// TX Statistics
+static uint32_t tx_bytes = 0;
+static uint32_t tx_packets = 0;
 static uint32_t tx_overrun = 0;
+static uint32_t tx_buffer_error = 0;
 
 // Buffer Size must be 256. (exploits the natural wrapping of a byte).
 #define RX_BUFFER_SIZE (256)
 static uint8_t rx_buffer[RX_BUFFER_SIZE];
 static uint8_t rx_head = 0;
 static uint8_t rx_tail = 0;
+
+// RX Statistics
+static uint32_t rx_bytes = 0;
+static uint32_t rx_packets = 0;
 static uint32_t rx_overrun = 0;
 
 // Actual Buffer we send data in over the USB. (Word aligned for DMA purposes)
 static uint8_t usb_tx_buffer[CONF_USB_COMPOSITE_CDC_ACM_DATA_BULKIN_MAXPKSZ] __attribute__ ((aligned (4)));
 static uint8_t usb_rx_buffer[CONF_USB_COMPOSITE_CDC_ACM_DATA_BULKIN_MAXPKSZ] __attribute__ ((aligned (4)));
+
+static void PrintUSBStats(void);
 
 static bool cdc_bulk_out(const uint8_t ep,            // The endpoint we are TXing to
                          const enum usb_xfer_code rc, // The status (should be USB_XFER_DONE)
@@ -81,10 +89,10 @@ static bool cdcdf_demo_cb_bulk_in(const uint8_t ep, const enum usb_xfer_code rc,
 {
 	uint32_t rx_buffered = 0;
 
-	in_eps[bulk_ins & 0xF] = ep;
-	in_rcs[bulk_ins & 0xF] = rc;
-	in_cnt[bulk_ins & 0xF] = count;
-	bulk_ins++;
+	// Keep Receiver stats.
+	rx_packets++;
+	rx_bytes += count;
+
 	// On entry:
 	// The last buffer set with cdcdf_acm_read will hold
 	// the rx'd data.
@@ -160,8 +168,16 @@ static void USB_CDC_TX_Handler_task(void *p)
 				usb_tx_buffer[tx_buffered++] = tx_buffer[tx_tail++];
 			} 
 
+			tx_bytes += tx_buffered;
+			tx_packets++;
+
 			cdcdf_acm_write((uint8_t*)usb_tx_buffer, tx_buffered); /* generate data */
+		} else if (TX_Task_Waiting != NULL) {
+			TaskHandle_t Task_Waiting = TX_Task_Waiting;
+			TX_Task_Waiting = NULL;
+    		xTaskNotifyGive( Task_Waiting );	
 		}
+
 	}
 }
 
@@ -187,13 +203,27 @@ static void USB_CDC_RX_Handler_task(void *p)
 				case '?' :
 					printfD("Command List:\n");
 					printfD("  '?' = This Menu\n");
-					printfD("  'S' = OS Statistics\n");
+					printfD("  'M' = Memory Statistics (ram)\n");
+					printfD("  'O' = OS Statistics\n");
+					printfD("  'U' = USB Statistics\n");
 				break;
 
-				case 'S' :
-				case 's' :
-					printfD("OS Statistics:");
+				case 'M' :
+				case 'm' :
+					printfD("MEMORY Statistics (ram):\n");
+					PrintMemoryStats();
+				break;
+
+				case 'O' :
+				case 'o' :
+					printfD("OS Statistics:\n");
 					vTaskPrintRunTimeStats();
+				break;
+
+				case 'U' :
+				case 'u' :
+					printfD("USB Statistics:\n");
+					PrintUSBStats();
 				break;
 
 				default :
@@ -207,6 +237,8 @@ static void USB_CDC_RX_Handler_task(void *p)
 
 void cdc_serial_comms_init(void)
 {
+	TX_Task_Waiting = NULL; // Nothing is waiting on TX to clear.
+
 	// The first handler, processes connection state.
 	// This will register the TX/RX call backs on the first connection.
 	cdcdf_acm_register_callback(CDCDF_ACM_CB_STATE_C, (FUNC_PTR)cdcdf_demo_cb_state_c);
@@ -268,10 +300,36 @@ uint32_t SerialTXData(bool debug, const void *buf, uint32_t cnt) {
 		// Can ONLY call this one at a time.
 		if (xSemaphoreTake( xprintfMutex, portMAX_DELAY) == pdTRUE )
 		{
-			// Copy a buffers worth from the TX queue.
-			while (((tx_head+1) != tx_tail) && (sent < cnt)) {
-				tx_buffer[tx_head++] = ((uint8_t*)buf)[sent++];
-			} 
+			while (sent < cnt) {
+				if ((tx_head+1) != tx_tail) {
+					tx_buffer[tx_head++] = ((uint8_t*)buf)[sent++];
+				} else {
+					// No room in the buffer, give the USB task up to 10ms to 
+					// clear some buffer for us. NOTE: This is RACY, but in 
+					// the unlikely event we hit the race condition the
+					// worst case outcome is a 20ms delay. NOTE: This will only
+					// clear by the Transmit task when the whole buffer is sent.
+					// Which, at 12MBPS USB should take ~7 or 8ms
+
+					TX_Task_Waiting = xTaskGetCurrentTaskHandle();
+
+					// Trigger Transmitter if it is idle.
+					if (tx_idle) {
+						tx_idle = false;
+						xTaskNotifyGive( xUSBCDC_TX_Task );
+					}
+
+					// Wait till there is space in the buffer.
+					ulTaskNotifyTake( pdTRUE, pdMS_TO_TICKS(10));
+					TX_Task_Waiting = NULL;
+
+					// Can ONLY be true if we timed out.
+					if ((tx_head+1) == tx_tail) {
+						tx_buffer_error++;
+						break;
+					}
+				}
+			}
 
 			if (tx_idle && (tx_head != tx_tail)) {
 				tx_idle = false;
@@ -287,54 +345,15 @@ uint32_t SerialTXData(bool debug, const void *buf, uint32_t cnt) {
 	return sent;
 }
 
-uint32_t SerialPrint(const void *buf)
+static void PrintUSBStats(void) 
 {
-	uint32_t ssize = strlen(buf);
-	return SerialTXData(false, buf, ssize);
+	printfD("  USB Serial TX :\n");
+	printfD("    Bytes     = %u\n", (unsigned int)tx_bytes);
+	printfD("    Packets   = %u\n", (unsigned int)tx_packets);
+	printfD("    Overrun   = %u\n", (unsigned int)tx_overrun);
+	printfD("    BufferErr = %u\n", (unsigned int)tx_buffer_error);
+	printfD("  USB Serial RX :\n");
+	printfD("    Bytes     = %u\n", (unsigned int)rx_bytes);
+	printfD("    Packets   = %u\n", (unsigned int)rx_packets);
+	printfD("    Overrun   = %u\n", (unsigned int)rx_overrun);
 }
-
-uint32_t SerialPrintDebug(const void *buf)
-{
-	uint32_t ssize = strlen(buf);
-	return SerialTXData(true, buf, ssize);
-}
-
-
-#if 0
-#define MAX_PRINTF_SIZE 90
-char printf_buffer[MAX_PRINTF_SIZE+1];
-
-extern void USB_printf(const char *fmt, ...);
-
-void USB_printf(const char *fmt, ...)
-{
-	int msize;
-	int value;
-    va_list args;
- 	if (xSemaphoreTake( xprintfMutex, ( TickType_t ) 10 ) == pdTRUE )
-    {
-		if (cdc_connected) {
-			va_start(args, fmt);
-			//msize = vsnprintf(printf_buffer, MAX_PRINTF_SIZE+1, fmt, args);
-			strncpy(printf_buffer,fmt,sizeof(printf_buffer));
-			value = va_arg(args, int);
-			printf_buffer[8] = 0x30 + ((value/10)%10);
-			printf_buffer[9] = 0x30 + (value%10);
-
-			msize = strlen(printf_buffer);
-			va_end(args);
-
-			cdcdf_acm_write((uint8_t*)printf_buffer, msize); /* generate data */
-		} else if (fmt == NULL) {
-			// Code path to stop my variables being optimised out.
-			out_eps[bulk_outs & 0xF] = 0x55;
-			out_rcs[bulk_ins & 0xF] = 0xFF;
-			out_cnt[bulk_outs & 0xF] = 0xAAAAAAAA;
-		}
-    
-    	/* We have finished accessing the shared resource.  Release the
-           semaphore. */
-        xSemaphoreGive( xprintfMutex );
-    }	
-}
-#endif
