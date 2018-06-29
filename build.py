@@ -255,7 +255,8 @@ BUILD={
             ],
 
             'SRC'     : [
-            ] + util.all_files_in('OvenACE','.c',True),
+            ] + util.all_files_in('OvenACE','.c',True)
+              + util.all_files_in('OvenACE','.cpp',True),
             'INCLUDE' : [
             ] + util.all_directories_of('OvenACE','.h'),
 
