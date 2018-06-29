@@ -10,6 +10,19 @@
 static uint8_t overflow_hz;
 static uint32_t last_hz_read;
 
+const int pow10[10] = {
+	1, 
+	10, 
+	100, 
+	1000, 
+	10000, 
+	100000, 
+	1000000, 
+	10000000, 
+	100000000, 
+	1000000000
+};
+
 #if defined(DEBUG)
 	static volatile int8_t      *bad_task_name;
 	static volatile xTaskHandle *bad_task_handle;
@@ -100,6 +113,33 @@ uint32_t vGetRunTimeCounterValue(void)
 	// Which is enough for the oven statistics.
 	return ((this_hz >> 8) | (overflow_hz < 24));
 }
+
+void delayMicroseconds(uint16_t us)
+{
+  uint32_t start;
+  uint32_t duration;
+  uint32_t now;
+
+  if (us == 0) {
+	  return;
+  }
+  
+  start    = CPU_HZ_COUNTER();
+
+  // Sleep and block for delays greater than a millisecond.
+  if (us >= 1000) {
+	  delay(us/1000);
+  }
+
+  duration = ((uint64_t)us * configCPU_CLOCK_HZ) / 1000000;
+  now      = CPU_HZ_COUNTER();
+
+  // Spin with interrupts enabled for durations less than a millisecond.
+  while ((now - start) < duration) {
+	  now = CPU_HZ_COUNTER();
+  }
+}
+
 
 const char * const TASK_STATE_NAMES[] = {
 	[eRunning]   = "RUNNING",
@@ -218,7 +258,7 @@ static uint32_t IRQStackFree(void)
 		start++;
 	}
 
-	return (uint32_t)(start - &_sstack);
+	return ((uint32_t)(start - &_sstack))*sizeof(uint32_t);
 }
 
 void PrintMemoryStats(void)
@@ -232,15 +272,16 @@ void PrintMemoryStats(void)
 	printfD("  HEAP :\n");
 	printfD("    Start    = 0x%08X\n", (unsigned)&_sheap);
 	printfD("    End      = 0x%08X\n", (unsigned)&_eheap);
-	printfD("    Size     = %u\n"    , (unsigned)(&_eheap - &_sheap));
+	printfD("    Size     = %u\n"    , (unsigned)configTOTAL_HEAP_SIZE);
 	printfD("    Free     = %u\n"    , xPortGetFreeHeapSize());
 	printfD("    Min Free = %u\n"    , xPortGetMinimumEverFreeHeapSize());
 	printfD("\n");
 
 	printfD("  IRQ STACK :\n");
-	printfD("    Start    = 0x%08X\n", (unsigned)&_sstack);
-	printfD("    End      = 0x%08X\n", (unsigned)&_estack);
-	printfD("    Top      = 0x%08X\n", (unsigned)__get_MSP());
-	printfD("    Size     = %u\n"    , (unsigned)(&_estack - &_sstack));
+	printfD("    Top      = 0x%08X\n", (unsigned)&_estack);
+	printfD("    Current  = 0x%08X\n", (unsigned)__get_MSP());
+	printfD("    Bottom   = 0x%08X\n", (unsigned)&_sstack);
+	printfD("    Size     = %u\n"    , ((unsigned)(&_estack - &_sstack))*sizeof(uint32_t));
 	printfD("    Free     = %u\n"    , (unsigned)IRQStackFree());
 }
+

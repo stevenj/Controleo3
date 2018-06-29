@@ -21,6 +21,14 @@ extern "C" {
 // AT 48Mhz this will wrap in about 89 Seconds of run time.
 #define CPU_HZ_COUNTER() (TC4->COUNT32.COUNT.reg)
 
+#define millis() ((xTaskGetTickCount() * 1000)/configTICK_RATE_HZ)
+#define delay(x) vTaskDelay(x/portTICK_PERIOD_MS)
+void delayMicroseconds(uint16_t us);
+
+extern const int pow10[10];
+#define POW10(x) (x < 0? 0 : x <= 9? pow10[x] : pow10[9]) 
+
+
 // Returns the CPU HZ / 256 which @ 48Mhz gives about 6 Hours of
 // Runtime.
 uint32_t vGetRunTimeCounterValue(void);
