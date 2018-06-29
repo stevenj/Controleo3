@@ -94,7 +94,16 @@
         "hash_set": "c",
         "bitset": "c",
         "chrono": "c",
-        "algorithm": "c"
+        "algorithm": "c",
+        "deque": "c",
+        "forward_list": "c",
+        "list": "c",
+        "unordered_map": "c",
+        "unordered_set": "c",
+        "vector": "c",
+        "string_view": "c",
+        "system_error": "cpp",
+        "sstream": "cpp"
     },
     "python.pythonPath": "/usr/bin/python3",
     "git.ignoreLimitWarning": true,
