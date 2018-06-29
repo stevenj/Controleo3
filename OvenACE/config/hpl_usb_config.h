@@ -100,7 +100,7 @@
 // <1024=> Cached by 1024 bytes buffer (interrupt or isochronous EP)
 // <id> usb_arch_ep1_cache
 #ifndef CONF_USB_EP1_CACHE
-#define CONF_USB_EP1_CACHE 0
+#define CONF_USB_EP1_CACHE 64
 #endif
 
 // <o> Cache buffer size for EP1 IN
@@ -138,7 +138,7 @@
 // <1024=> Cached by 1024 bytes buffer (interrupt or isochronous EP)
 // <id> usb_arch_ep2_cache
 #ifndef CONF_USB_EP2_CACHE
-#define CONF_USB_EP2_CACHE 0
+#define CONF_USB_EP2_CACHE 64
 #endif
 
 // <o> Cache buffer size for EP2 IN
