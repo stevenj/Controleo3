@@ -44,9 +44,13 @@ extern uint32_t _estack;
 
 
 #if defined(DEBUG)
-    // Create a Trace Buffer
-    #define TRACE_BUFFER_SIZE 64
-    __attribute__((__aligned__(TRACE_BUFFER_SIZE * sizeof(uint32_t)))) uint32_t mtb[TRACE_BUFFER_SIZE];
+    // Create a Trace Buffer - Place in its own section.
+    #define TRACE_BUFFER_SIZE 256
+    uint32_t mtb[TRACE_BUFFER_SIZE]
+    __attribute__((
+        __aligned__(TRACE_BUFFER_SIZE * sizeof(uint32_t)),
+        section ("MTB")
+    )); 
 #endif
 
 /** \cond DOXYGEN_SHOULD_SKIP_THIS */

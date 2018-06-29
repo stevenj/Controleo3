@@ -107,6 +107,16 @@ SECTIONS
     . = ALIGN(4);
     _etext = .;
 
+    /* We want the Micro Trace Buffer (if it exists) at the start of ram */
+    .mtb :
+    {
+        . = ALIGN(4);
+        _smtb = .;
+        *(MTB);
+        . = ALIGN(4);
+        _emtb = .;
+    } > ram
+
     .relocate : AT (_etext)
     {
         . = ALIGN(4);
