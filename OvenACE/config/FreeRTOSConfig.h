@@ -44,7 +44,7 @@ void assert_triggered(const char *file, uint32_t line);
 //#define configTOTAL_HEAP_SIZE ((size_t)(8192))
 extern uint32_t _sheap;
 extern uint32_t _eheap;
-#define configTOTAL_HEAP_SIZE ((uint32_t)(&_eheap-&_sheap))
+#define configTOTAL_HEAP_SIZE (((uint32_t)(&_eheap-&_sheap))*sizeof(uint32_t))
 #define ucHeap (&_sheap)
 #endif
 
