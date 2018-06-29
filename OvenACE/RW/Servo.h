@@ -1,7 +1,11 @@
 #ifndef __SERVO_H__
 #define __SERVO_H__
 
-#include <Arduino.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // Starts the timer.  Called on startup
 void initializeTimer(void);
@@ -14,5 +18,9 @@ void setServoPosition(uint8_t servoDegrees, uint16_t timeToTake);
 
 // Convert degrees (0-180) to a timer counter value
 uint16_t degreesToTimerCounter(uint8_t servoDegrees);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

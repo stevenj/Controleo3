@@ -1,6 +1,8 @@
 #ifndef __TEMPERATURE_H__
 #define __TEMPERATURE_H__
 
+#include <stdint.h>
+
 // Initialize the MAX31856's registers
 void initTemperature(void);
 
@@ -11,6 +13,6 @@ void takeCurrentThermocoupleReading(void);
 float getCurrentTemperature(void);
 
 // Convert the temperature to a string
-char *getTemperatureString(char *str, float temperature, boolean displayInCelsius);
+char *getTemperatureString(char *str, float temperature, bool displayInCelsius);
 
 #endif

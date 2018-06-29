@@ -29,7 +29,7 @@
 
 
 #include	"Controleo3MAX31856.h"
-
+#include "ArduinoDefs.h"
 
 // Define which pins are connected to the MAX31856.  The DRDY and FAULT outputs
 // from the MAX31856 are not used in this library.
@@ -43,25 +43,25 @@ void Controleo3MAX31856::begin(void)
     pinMode(THERMOCOUPLE_SDO, INPUT_PULLUP);
 
     // Default output pins state
-    digitalWrite(THERMOCOUPLE_CS, HIGH);
-    digitalWrite(THERMOCOUPLE_CLK, HIGH);
+    digitalWrite(THERMOCOUPLE_CS, 1);
+    digitalWrite(THERMOCOUPLE_CLK, 1);
 
     // Set up the shadow registers with the default values
-    byte reg[NUM_REGISTERS] = {0x00,0x03,0xff,0x7f,0xc0,0x7f,0xff,0x80,0,0,0,0};
+    uint8_t reg[NUM_REGISTERS] = {0x00,0x03,0xff,0x7f,0xc0,0x7f,0xff,0x80,0,0,0,0};
     for (int i=0; i<NUM_REGISTERS; i++)
         _registers[i] = reg[i];
 }
 
 
 // Write the given data to the MAX31856 register
-void Controleo3MAX31856::writeRegister(byte registerNum, byte data)
+void Controleo3MAX31856::writeRegister(uint8_t registerNum, uint8_t data)
 {
     // Sanity check on the register number
     if (registerNum >= NUM_REGISTERS)
         return;
 
     // Select the MAX31856 chip
-    digitalWrite(THERMOCOUPLE_CS, LOW);
+    digitalWrite(THERMOCOUPLE_CS, 0);
 
     // Write the register number, with the MSB set to indicate a write
     writeByte(WRITE_OPERATION(registerNum));
@@ -70,7 +70,7 @@ void Controleo3MAX31856::writeRegister(byte registerNum, byte data)
     writeByte(data);
 
     // Deselect MAX31856 chip
-    digitalWrite(THERMOCOUPLE_CS, HIGH);
+    digitalWrite(THERMOCOUPLE_CS, 1);
 
     // Save the register value, in case the registers need to be restored
     _registers[registerNum] = data;
@@ -81,13 +81,13 @@ void Controleo3MAX31856::writeRegister(byte registerNum, byte data)
 // the conversion takes place in the background within 155 ms, or longer depending on the
 // number of samples in each reading (see CR1).
 // Returns the temperature, or an error (FAULT_OPEN, FAULT_VOLTAGE or NO_MAX31856)
-double	Controleo3MAX31856::readThermocouple(byte unit)
+double	Controleo3MAX31856::readThermocouple(uint8_t unit)
 {
     double temperature;
     long data;
 
     // Select the MAX31856 chip
-    digitalWrite(THERMOCOUPLE_CS, LOW);
+    digitalWrite(THERMOCOUPLE_CS, 0);
 
     // Read data starting with register 0x0c
     writeByte(READ_OPERATION(0x0c));
@@ -96,7 +96,7 @@ double	Controleo3MAX31856::readThermocouple(byte unit)
     data = readData();
 
     // Deselect MAX31856 chip
-    digitalWrite(THERMOCOUPLE_CS, HIGH);
+    digitalWrite(THERMOCOUPLE_CS, 1);
 
     // If there is no communication from the IC then data will be all 1's because
     // of the internal pullup on the data line (INPUT_PULLUP)
@@ -135,13 +135,13 @@ double	Controleo3MAX31856::readThermocouple(byte unit)
 // Read the junction (IC) temperature either in Degree Celsius or Fahrenheit.
 // This routine also makes sure that communication with the MAX31856 is working and
 // will return NO_MAX31856 if not.
-double	Controleo3MAX31856::readJunction(byte unit)
+double	Controleo3MAX31856::readJunction(uint8_t unit)
 {
     double temperature;
     long data, temperatureOffset;
 
     // Select the MAX31856 chip
-    digitalWrite(THERMOCOUPLE_CS, LOW);
+    digitalWrite(THERMOCOUPLE_CS, 0);
 
     // Read data starting with register 8
     writeByte(READ_OPERATION(8));
@@ -150,7 +150,7 @@ double	Controleo3MAX31856::readJunction(byte unit)
     data = readData();
 
     // Deselect MAX31856 chip
-    digitalWrite(THERMOCOUPLE_CS, HIGH);
+    digitalWrite(THERMOCOUPLE_CS, 1);
 
     // If there is no communication from the IC then data will be all 1's because
     // of the internal pullup on the data line (INPUT_PULLUP)
@@ -200,7 +200,7 @@ double Controleo3MAX31856::verifyMAX31856()
     long data, reg;
 
     // Select the MAX31856 chip
-    digitalWrite(THERMOCOUPLE_CS, LOW);
+    digitalWrite(THERMOCOUPLE_CS, 0);
 
     // Read data starting with register 0
     writeByte(READ_OPERATION(0));
@@ -209,7 +209,7 @@ double Controleo3MAX31856::verifyMAX31856()
     data = readData();
 
     // Deselect MAX31856 chip
-    digitalWrite(THERMOCOUPLE_CS, HIGH);
+    digitalWrite(THERMOCOUPLE_CS, 1);
 
     // If there is no communication from the IC then data will be all 1's because
     // of the internal pullup on the data line (INPUT_PULLUP)
@@ -223,7 +223,7 @@ double Controleo3MAX31856::verifyMAX31856()
 
     // Communication to the IC is working, but the register values are not correct
     // Select the MAX31856 chip
-    digitalWrite(THERMOCOUPLE_CS, LOW);
+    digitalWrite(THERMOCOUPLE_CS, 0);
 
     // Start writing from register 0
     writeByte(WRITE_OPERATION(0));
@@ -233,7 +233,7 @@ double Controleo3MAX31856::verifyMAX31856()
         writeByte(_registers[i]);
 
     // Deselect MAX31856 chip
-    digitalWrite(THERMOCOUPLE_CS, HIGH);
+    digitalWrite(THERMOCOUPLE_CS, 1);
 
     // For now, return an error but soon valid temperatures will be returned
     return NO_MAX31856;
@@ -250,13 +250,13 @@ long Controleo3MAX31856::readData()
     // Shift in 32 bits of data
     while (bitMask)
     {
-        digitalWrite(THERMOCOUPLE_CLK, LOW);
+        digitalWrite(THERMOCOUPLE_CLK, 0);
 
         // Store the data bit
         if (digitalRead(THERMOCOUPLE_SDO))
             data += bitMask;
 
-        digitalWrite(THERMOCOUPLE_CLK, HIGH);
+        digitalWrite(THERMOCOUPLE_CLK, 1);
 
         bitMask >>= 1;
     }
@@ -267,18 +267,18 @@ long Controleo3MAX31856::readData()
 
 // Write out 8 bits of data to the MAX31856 chip. Minimum clock pulse width is 100 ns
 // so no delay is required between signal toggles.
-void Controleo3MAX31856::writeByte(byte data)
+void Controleo3MAX31856::writeByte(uint8_t data)
 {
-    byte bitMask = 0x80;
+    uint8_t bitMask = 0x80;
 
     // Shift out 8 bits of data
     while (bitMask)
     {
         // Write out the data bit.  Has to be held for 35ns, so no delay required
-        digitalWrite(THERMOCOUPLE_SDI, data & bitMask? HIGH: LOW);
+        digitalWrite(THERMOCOUPLE_SDI, data & bitMask? 1: 0);
 
-        digitalWrite(THERMOCOUPLE_CLK, LOW);
-        digitalWrite(THERMOCOUPLE_CLK, HIGH);
+        digitalWrite(THERMOCOUPLE_CLK, 0);
+        digitalWrite(THERMOCOUPLE_CLK, 1);
 
         bitMask >>= 1;
     }

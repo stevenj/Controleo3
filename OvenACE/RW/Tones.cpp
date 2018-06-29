@@ -2,9 +2,11 @@
 // Released under CC BY-NC-SA 3.0 license
 // Build a reflow oven: http://whizoo.com
 //
-#include <Arduino.h>
+#include <stdint.h>
 #include "ReflowWizard.h"
 #include "Controleo3.h"
+#include "ArduinoDefs.h"
+#include "rtos_support.h"
 
 // Frequency of the various notes
 
@@ -99,14 +101,14 @@
 #define NOTE_DS8 4978
 
 
-const int tuneStartup[] PROGMEM = {NOTE_C5,8,NOTE_G4,8,-1};
-const int tuneButtonPressed[] PROGMEM = {NOTE_F5,500,-1};
-const int tuneInvalidPress[] PROGMEM = {NOTE_B2,10,-1};
-const int tuneReflowDone[] PROGMEM = {NOTE_C5,4,NOTE_G4,8,NOTE_G4,8, NOTE_A4,4,NOTE_G4,4,0,4,NOTE_B4,4,NOTE_C5,4,-1};
-const int tuneRemoveBoards[] PROGMEM = {NOTE_C5,4,NOTE_B4,4,NOTE_E4,2,-1};
-const int tuneScreenshotBusy[] PROGMEM = {NOTE_C8,1000,-1};
-const int tuneScreenshotDone[] PROGMEM = {NOTE_D2,10,NOTE_D4,10,NOTE_D6,6,-1};
-const int tuneReflowBeep[] PROGMEM = {NOTE_C4,16,NOTE_B5,10,-1};
+const int tuneStartup[]   = {NOTE_C5,8,NOTE_G4,8,-1};
+const int tuneButtonPressed[]   = {NOTE_F5,500,-1};
+const int tuneInvalidPress[]   = {NOTE_B2,10,-1};
+const int tuneReflowDone[]   = {NOTE_C5,4,NOTE_G4,8,NOTE_G4,8, NOTE_A4,4,NOTE_G4,4,0,4,NOTE_B4,4,NOTE_C5,4,-1};
+const int tuneRemoveBoards[]   = {NOTE_C5,4,NOTE_B4,4,NOTE_E4,2,-1};
+const int tuneScreenshotBusy[]   = {NOTE_C8,1000,-1};
+const int tuneScreenshotDone[]   = {NOTE_D2,10,NOTE_D4,10,NOTE_D6,6,-1};
+const int tuneReflowBeep[]   = {NOTE_C4,16,NOTE_B5,10,-1};
 
 const int *listOfTunes[MAX_TUNES] = {
   tuneStartup, tuneButtonPressed, tuneInvalidPress, tuneReflowDone, tuneRemoveBoards,tuneScreenshotBusy,tuneScreenshotDone,tuneReflowBeep

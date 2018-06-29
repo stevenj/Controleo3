@@ -1,13 +1,13 @@
 #ifndef __TOUCH_H_
 #define __TOUCH_H_
 
-#include <Arduino.h>
+#include <stdint.h>
 
 // Calibrate the touch screen
 void CalibrateTouchscreen(void);
 
 // Draw the calibration crosshairs on the screen
-void drawCrosshairs(uint16_t x, uint16_t y, boolean draw);
+void drawCrosshairs(uint16_t x, uint16_t y, bool draw);
 
 // Debounce touches, but allow for tap-and-hold
 void debounce(void);
@@ -28,7 +28,7 @@ void clearTouchTargets(void);
 void setTouchIntervalCallback(void (*f) (), uint16_t interval);
 
 // Callback function when user taps in top-right corner to change temperature units
-void setTouchTemperatureUnitChangeCallback(void (*f) (boolean displayInCelsius));
+void setTouchTemperatureUnitChangeCallback(void (*f) (bool displayInCelsius));
 
 void defineTouchArea(uint16_t x, uint16_t y, uint16_t w, uint16_t h);
 

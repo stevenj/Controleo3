@@ -5,6 +5,9 @@
 // Flash controller for W25Q80BV
 
 #include "Controleo3Flash.h"
+#include "SimplePIO.h"
+#include "printf-stdarg.h"
+#include "rtos_support.h"
 
 // Pin IO modes
 #define PIN_IO_NORMAL                   0
@@ -86,9 +89,9 @@
 Controleo3Flash::Controleo3Flash()
 {
     // Get the addresses of Port A (D2 is on port A)
-    portAOut   = portOutputRegister(digitalPinToPort(2));
-    portAIn    = portInputRegister(digitalPinToPort(2));
-    portAMode  = portModeRegister(digitalPinToPort(2));
+    portAOut   = &PORT_OUT(PA(0));
+    portAIn    = &PORT_IN(PA(0));
+    portAMode  = &PORT_DIR(PA(0));
 }
 
 
@@ -142,24 +145,24 @@ bool Controleo3Flash::verifyFlashIC()
     FLASH_CS_ACTIVE;
     write8(CMD_JEDEC_ID);
     if (read8() != 0xEF)
-        msg = "Err:verifyFlashIC:JEDEC";
+        msg = "Err:verifyFlashIC:JEDEC\n";
     if (read8() != 0x40)
-        msg = "Err:verifyFlashIC:Size1";
+        msg = "Err:verifyFlashIC:Size1\n";
     if (read8() != 0x14)
-        msg = "Err:verifyFlashIC:Size2";
+        msg = "Err:verifyFlashIC:Size2\n";
 	FLASH_CS_IDLE;
 
     // Verify the Manufacturer and device ID
     FLASH_CS_ACTIVE;
     write8(CMD_MANUFACTURER_ID); write8(0); write8(0); write8(0);
     if (read8() != 0xEF)
-        msg = "Err:verifyFlashIC:ManID";
+        msg = "Err:verifyFlashIC:ManID\n";
     if (read8() != 0x13)
-        msg = "Err:verifyFlashIC:DevID";
+        msg = "Err:verifyFlashIC:DevID\n";
 	FLASH_CS_IDLE;
 
     if (msg) {
-        SerialUSB.println(msg);
+        printfD(msg);
         return false;
     }
     return true;
@@ -180,7 +183,7 @@ void Controleo3Flash::waitUntilNotBusy(uint16_t timeMillis)
             return;
         delayMicroseconds(100);
     }
-    SerialUSB.println("Err:waitUntilNotBusy:Timeout");
+    printfD("Err:waitUntilNotBusy:Timeout\n");
 }
 
 
@@ -294,7 +297,7 @@ void Controleo3Flash::eraseProfileBlock(uint16_t block)
 {
     // Sanity check
     if ((block & 0x0F) || block < 64 || block > 511) {
-        SerialUSB.println("Profile block number out of range");
+        printfD("Profile block number out of range\n");
         return;
     }
 
@@ -324,7 +327,7 @@ void Controleo3Flash::eraseProfileBlock(uint16_t block)
 
 
 // Convenience function to allow writing to prefs
-void Controleo3Flash::allowWritingToPrefs(boolean allow) {
+void Controleo3Flash::allowWritingToPrefs(bool allow) {
     if (allow)
         protectFlash(PROTECT_NOT_PREFS, TEMPORARY_PROTECTION);
     else
@@ -699,10 +702,10 @@ void Controleo3Flash::dumpStatusRegisters()
     write8(CMD_READ_STATUS1_REGISTER);
     uint8_t s2 = read8();
     FLASH_CS_IDLE;
-    SerialUSB.print("Status Register 1 = 0x"); SerialUSB.print(s2, HEX);
+    printfD("Status Register 1 = 0x%02X\n", s2);
     FLASH_CS_ACTIVE;
     write8(CMD_READ_STATUS2_REGISTER);
-     s2 = read8();
+    s2 = read8();
     FLASH_CS_IDLE;
-    SerialUSB.print("  Status Register 2 = 0x"); SerialUSB.println(s2, HEX);
+    printfD("  Status Register 2 = 0x%02X\n", s2);
 }

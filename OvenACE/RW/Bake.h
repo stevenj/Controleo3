@@ -1,7 +1,7 @@
 #ifndef __BAKE_H__
 #define __BAKE_H__
 
-#include <Arduino.h>
+#include <stdint.h>
 
 // Stay in this function until the bake is done or canceled
 void bake(void);
@@ -10,14 +10,14 @@ void bake(void);
 void DisplayBakeTime(uint16_t duration, float temperature, int duty, int integral);
 
 // Display the baking phase on the screen
-void displayBakePhase(uint8_t phase, boolean abortDialogIsOnScreen);
+void displayBakePhase(uint8_t phase, bool abortDialogIsOnScreen);
 
 // Draw the abort dialog on the screen.  The user needs to confirm that they want to exit bake
 void drawBakingAbortDialog(void);
 
 // Display the bake temperature and duration on the screen
 // This is also a callback routine, called if the user taps in the top-right corner
-void displayBakeTemperatureAndDuration(boolean displayCelsius);
+void displayBakeTemperatureAndDuration(bool displayCelsius);
 
 // Display the countdown timer
 void displayBakeSecondsLeft(uint32_t seconds);

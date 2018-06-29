@@ -2,16 +2,19 @@
 // Released under CC BY-NC-SA 3.0 license
 // Build a reflow oven: http://whizoo.com
 //
-#include <Arduino.h>
+#include <stdint.h>
 #include "Utility.h"
 #include "ReflowWizard.h"
 #include "Outputs.h"
 #include "Render.h"
+#include "string.h"
+#include "stdio.h"
+#include "rtos_support.h"
 
 // Convert the duration into a readable string
 void secondsToEnglishString(char *str, uint32_t seconds)
 {
-  boolean hasHours = false;
+  bool hasHours = false;
   // Take care of hours
   if (seconds >= 3600) {
     sprintf(str, "%ld hour%c", seconds/3600, seconds>=7200? 's':0);
@@ -70,7 +73,7 @@ void animateIcons(uint16_t x)
     // Handle heating elements first
     if (isHeatingElement(prefs.outputType[i])) {
       // Is the element on?
-      if (getOutput(i) == HIGH)
+      if (getOutput(i) == 1)
         bitmap = BITMAP_ELEMENT_ON;
       else
         bitmap = BITMAP_ELEMENT_OFF;
@@ -83,7 +86,7 @@ void animateIcons(uint16_t x)
         bitmap = BITMAP_COOLING_FAN1;
 
       // Should the fan be animated?
-      if (getOutput(i) == HIGH)
+      if (getOutput(i) == 1)
         bitmap += animationPhase;
     }
 

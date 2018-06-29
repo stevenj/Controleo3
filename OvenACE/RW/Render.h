@@ -29,7 +29,7 @@ int16_t getYOffsetForCharacter(uint8_t font, uint8_t c);
 // Determine if the character is in the font set
 // 9 and 12-point fonts contain all printable characters
 // The 22-point font contains a small subset
-boolean isSupportedCharacter(uint8_t font, uint8_t c);
+bool isSupportedCharacter(uint8_t font, uint8_t c);
 
 uint16_t preCharacterSpace(uint8_t font, char c);
 
@@ -39,7 +39,7 @@ uint16_t postCharacterSpace(uint8_t font, char c) ;
 void displayFixedWidthString(uint16_t x, uint16_t y, char *str, uint8_t maxChars, uint8_t font);
 
 // Draw a button on the screen
-void drawButton(uint16_t x, uint16_t y, uint16_t width, uint16_t textWidth, boolean useLargeFont, char *text);
+void drawButton(uint16_t x, uint16_t y, uint16_t width, uint16_t textWidth, bool useLargeFont, char *text);
 
 void drawButtonOutline(uint16_t x, uint16_t y, uint16_t width);
 

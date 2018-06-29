@@ -15,7 +15,7 @@
 #ifndef __SD_H__
 #define __SD_H__
 
-#include <Arduino.h>
+#include <stdint.h>
 
 #include "SdFat.h"
 #include "SdFatUtil.h"
@@ -25,7 +25,7 @@
 
 namespace SDLib {
 
-class File : public Stream {
+class File /* : public Stream */ {
  private:
   char _name[13]; // our name
   SdFile *_file;  // underlying file pointer
@@ -43,18 +43,18 @@ public:
   
 
   int read(void *buf, uint16_t nbyte);
-  boolean seek(uint32_t pos);
+  bool seek(uint32_t pos);
   uint32_t position();
   uint32_t size();
   void close();
   operator bool();
   char * name();
 
-  boolean isDirectory(void);
+  bool isDirectory(void);
   File openNextFile(uint8_t mode = O_RDONLY);
   void rewindDirectory(void);
   
-  using Print::write;
+  //using Print::write;
 };
 
 class SDClass {
@@ -70,29 +70,29 @@ private:
 public:
   // This needs to be called to set up the connection to the SD card
   // before other methods are used.
-  boolean begin();
+  bool begin();
   
   // Open the specified file/directory with the supplied mode (e.g. read or
   // write, etc). Returns a File object for interacting with the file.
   // Note that currently only one file can be open at a time.
   File open(const char *filename, uint8_t mode = FILE_READ);
-  File open(const String &filename, uint8_t mode = FILE_READ) { return open( filename.c_str(), mode ); }
+//  File open(const String &filename, uint8_t mode = FILE_READ) { return open( filename.c_str(), mode ); }
 
   // Methods to determine if the requested file path exists.
-  boolean exists(char *filepath);
-  boolean exists(const String &filepath) { return exists(filepath.c_str()); }
+  bool exists(char *filepath);
+//  bool exists(const String &filepath) { return exists(filepath.c_str()); }
 
   // Create the requested directory heirarchy--if intermediate directories
   // do not exist they will be created.
-  boolean mkdir(char *filepath);
-  boolean mkdir(const String &filepath) { return mkdir(filepath.c_str()); }
+  bool mkdir(char *filepath);
+//  bool mkdir(const String &filepath) { return mkdir(filepath.c_str()); }
   
   // Delete the file.
-  boolean remove(char *filepath);
-  boolean remove(const String &filepath) { return remove(filepath.c_str()); }
+  bool remove(char *filepath);
+//  bool remove(const String &filepath) { return remove(filepath.c_str()); }
   
-  boolean rmdir(char *filepath);
-  boolean rmdir(const String &filepath) { return rmdir(filepath.c_str()); }
+  bool rmdir(char *filepath);
+//  bool rmdir(const String &filepath) { return rmdir(filepath.c_str()); }
 
 private:
 
@@ -104,7 +104,7 @@ private:
   int fileOpenMode;
   
   friend class File;
-  friend boolean callback_openPath(SdFile&, char *, boolean, void *); 
+  friend bool callback_openPath(SdFile&, char *, bool, void *); 
 };
 
 extern SDClass SD;

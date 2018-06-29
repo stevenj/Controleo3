@@ -1,7 +1,7 @@
 #ifndef __LEARN_H__
 #define __LEARN_H__
 
-#include <Arduino.h>
+#include <stdint.h>
 
 // Stay in this function until learning is done or canceled
 void learn(void);
@@ -15,7 +15,7 @@ void drawLearningAbortDialog(void);
 void displaySecondsLeft(uint32_t overallSeconds, uint32_t phaseSeconds);
 
 // Draw the performance graph to indicate instantaneous performance
-void drawPerformanceBar(boolean redraw, uint8_t percentage);
+void drawPerformanceBar(bool redraw, uint8_t percentage);
 
 // Calculate the overall oven score
 uint8_t ovenScore(void);

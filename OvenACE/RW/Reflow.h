@@ -1,7 +1,7 @@
 #ifndef __REFLOW_H__
 #define __REFLOW_H__
 
-#include <Arduino.h>
+#include <stdint.h>
 
 void reflow(uint8_t profileNo);
 

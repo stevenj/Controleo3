@@ -1,7 +1,7 @@
 #ifndef __OUTPUTS_H__
 #define __OUTPUTS_H__
 
-#include <Arduino.h>
+#include <stdint.h>
 
 extern volatile uint32_t *portAOut, *portAMode, *portBOut, *portBMode;
 
@@ -9,23 +9,23 @@ extern volatile uint32_t *portAOut, *portAMode, *portBOut, *portBMode;
 void initOutputs(void);
 
 // Turn an output on or off
-void setOutput(uint8_t outputNumber, boolean state);
+void setOutput(uint8_t outputNumber, bool state);
 
 // Get the current state of an output
-boolean getOutput(uint8_t outputNumber);
+bool getOutput(uint8_t outputNumber);
 
 // Turn elements and fans on or off in one go
-void setOvenOutputs(boolean elementsOn, boolean convectionFanOn, boolean coolingFanOn);
+void setOvenOutputs(bool elementsOn, bool convectionFanOn, bool coolingFanOn);
 
 // Turn the convection fan on or off
-void turnConvectionFanOn(boolean on);
+void turnConvectionFanOn(bool on);
 
 // Turn the cooling fan on or off
-void turnCoolingFanOn(boolean on);
+void turnCoolingFanOn(bool on);
 
 // Check to see if outputs are configured.  Prevent bake/reflow if not
 // At least 2 elements must be heating elements
-boolean areOutputsConfigured(void);
+bool areOutputsConfigured(void);
 
 // See how many outputs are used
 uint8_t numOutputsConfigured(void);

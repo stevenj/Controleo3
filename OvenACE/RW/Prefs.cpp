@@ -9,6 +9,9 @@
 // Blocks are initialized to 0xFF after erase, so preferences should be added with this in mind.
 #include "Prefs.h"
 #include "ReflowWizard.h"
+#include "printf-stdarg.h"
+#include "rtos_support.h"
+#include "string.h"
 
 #define NO_OF_PREFS_BLOCKS          4
 #define PAGES_PER_PREFS_BLOCK       16
@@ -21,7 +24,7 @@ void getPrefs()
   // Sanity check on the size of the prefences
   if (sizeof(prefs) > 4096)
   {
-    SerialUSB.println("Prefs size must not exceed 4Kb!!!!!!!!");
+    printfD("Prefs size must not exceed 4Kb!!!!!!!!\n");
     // Hopefully getting a massive delay while developing new code alert you to this situation 
     delay(10000);
   }
@@ -65,7 +68,7 @@ void getPrefs()
     prefs.lastUsedProfileBlock = FIRST_PROFILE_BLOCK;
   }
 
-  SerialUSB.println("Read prefs from block " + String(prefsToUse) + ". Seq No = " + String(prefs.sequenceNumber));
+  printfD("Read prefs from block %d. Seq No = %lu\n", prefsToUse, prefs.sequenceNumber);
 
 /* Defaults for oven in build guide
   prefs.learningComplete = true;
@@ -123,7 +126,7 @@ void writePrefsToFlash()
 
   // Sanity check on prefs size (maximum is 4K)
   if (prefsSize > 4096) {
-    SerialUSB.println("Prefs exceed the 4K maximum!!!");
+    printfD("Prefs exceed the 4K maximum!!!\n");
     return;
   }
 
@@ -141,13 +144,13 @@ void writePrefsToFlash()
   // Protect flash again, now that writing is done
   flash.allowWritingToPrefs(false);
 
-  SerialUSB.println("Finished writing prefs to block " + String(lastPrefsBlock) + ". Seq No = " + String(prefs.sequenceNumber));
+  printfD("Finished writing prefs to block %d. Seq No = %lu", lastPrefsBlock, prefs.sequenceNumber);
   timeOfLastSavePrefsRequest = 0;
 }
 
 
 // This performs a factory reset, erasing preferences and profiles
-void factoryReset(boolean saveTouchCalibrationData)
+void factoryReset(bool saveTouchCalibrationData)
 {
   uint32_t sequenceNumber = prefs.sequenceNumber;
   

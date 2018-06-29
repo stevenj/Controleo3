@@ -3,7 +3,7 @@
 // Build a reflow oven: http://whizoo.com
 //
 
-#include <Arduino.h>
+#include <stdint.h>
 #include "Controleo3.h" // Hardware-specific library
 #include "ReflowWizard.h"
 #include "Outputs.h"
@@ -14,6 +14,11 @@
 #include "Tones.h"
 #include "Touch.h"
 #include "Screens.h"
+#include "ArduinoDefs.h"
+#include "rtos_support.h"
+#include "printf-stdarg.h"
+#include "stdio.h"
+#include "string.h"
 
 // Global temporary buffers (used everywhere)
 char buffer100Bytes[100];
@@ -34,7 +39,7 @@ void setup(void) {
 
   // See if there is a SD card present
   pinMode(SD_DETECT_PIN, INPUT_PULLUP);
-  if (digitalRead(SD_DETECT_PIN) == LOW) {
+  if (digitalRead(SD_DETECT_PIN) == 0) {
     // There is a SD card
     SD.begin();
 
@@ -67,7 +72,7 @@ void setup(void) {
   displayString(420, 290, FONT_9PT_BLACK_ON_WHITE, (char *) CONTROLEO3_VERSION);
   tft.pokeRegister(ILI9488_DISPLAYON);
   playTones(TUNE_STARTUP);
-  SerialUSB.begin(115200);
+  //SerialUSB.begin(115200);
 
   // Get the prefs from external flash
   getPrefs();
@@ -112,7 +117,7 @@ void loop()
 
 
 // Fixed BMP file header for screenshots
-const char bmpHeader[54] PROGMEM = {
+const char bmpHeader[54]   = {
   0x42, 0x4d, 0x36, 0x8, 0x7, 0x0, 0x0, 0x0, 0x0, 0x0,
   0x36, 0x0, 0x0, 0x0, 0x28, 0x0, 0x0, 0x0, 0xe0, 0x1,
   0x0, 0x0, 0xC0, 0xFE, 0xFF, 0xFF, 0x1, 0x0, 0x18, 0x0,
@@ -129,23 +134,23 @@ void takeScreenshot()
   char buf[320 * 3];
   // Initialize the SD card
   if (!SD.begin()) {
-    SerialUSB.println("Card failed, or not present");
+    printfD("Card failed, or not present\n");
     return;
   }
   
   // Open the file for writing
-  sprintf(buf, "C3_%05d.bmp", prefs.screenshotNumber);
+  sprintf(buf, "C3_%05u.bmp", prefs.screenshotNumber);
   File dataFile = SD.open(buf, FILE_WRITE);
   if (!dataFile) {
-    SerialUSB.println("Can't open " + String(buf));
+    printfD("Can't open %s\n", buf);
     return;
   }
-  SerialUSB.println("Writing screenshot to " + String(buf));
+  printfD("Writing screenshot to %s\n", buf);
   
   // Write the bitmap header
-  memcpy_P(buf, bmpHeader, 54);
+  memcpy(buf, bmpHeader, 54);
   dataFile.seek(0);
-  dataFile.write(buf, 54);
+  dataFile.write((uint8_t*)buf, 54);
 
   // Start the screen read
   tft.startReadBitmap(0, 0, 480, 320);
@@ -153,7 +158,7 @@ void takeScreenshot()
   // Keeping reading from the screen and writing to the SD card
   for (uint16_t i=0; i< 480; i++) {
     tft.readBitmap24bit((uint8_t *) buf, 320);
-    dataFile.write(buf, 320 * 3);
+    dataFile.write((uint8_t*)buf, 320 * 3);
     // Beep every 1/12 of the operation to let the user know something is happening
     if (i % 40 == 0)
       playTones(TUNE_SCREENSHOT_BUSY);
@@ -165,7 +170,7 @@ void takeScreenshot()
   prefs.screenshotNumber = (prefs.screenshotNumber + 1) % 10000;
   savePrefs();
   playTones(TUNE_SCREENSHOT_DONE);
-  SerialUSB.println("Screenshot written!");
+  printfD("Screenshot written!\n");
 }
 
 
@@ -191,8 +196,7 @@ void checkFreeMemory()
     return;
 
   // There has been a memory leak!
-  sprintf(buffer100Bytes, "Free RAM was %ld and is now %ld", freeRAMOnBoot, getFreeRAM());
-  SerialUSB.println(buffer100Bytes);
+  printfD("Free RAM was %ld and is now %ld\n", freeRAMOnBoot, getFreeRAM());
 //  drawThickRectangle(80, 70, 320, 135, 10, RED);
 //  displayString(114, 100, FONT_12PT_BLACK_ON_WHITE, (char *) "Memory Leak!!!");
 //  sprintf(buffer100Bytes, "%d bytes lost", freeRAMOnBoot - getFreeRAM());

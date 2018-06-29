@@ -12,15 +12,17 @@
 //#define LCD_DEBUG
 
 #include "Controleo3LCD.h"
-
+#include "SimplePIO.h"
+#include "rtos_support.h"
+#include "ArduinoDefs.h"
 
 // Constructor for the TFT display
 Controleo3LCD::Controleo3LCD(void)
 {
     // Get the addresses of Port B
-    portBOut   = portOutputRegister(digitalPinToPort(A2));
-    portBMode  = portModeRegister(digitalPinToPort(A2));
-    portBIn    = portInputRegister(digitalPinToPort(A2));
+    portBOut   = &PORT_OUT(PB(0));
+    portBIn    = &PORT_IN(PB(0));
+    portBMode  = &PORT_DIR(PB(0));
     flood8Reg  = ((uint8_t *) portBOut) + 1;
     bitmapReg  = ((uint16_t *) portBOut);
 }
@@ -49,7 +51,7 @@ void Controleo3LCD::begin()
 
 
 // Set the I/O mode on the read pin
-void Controleo3LCD::readMode(boolean enable)
+void Controleo3LCD::readMode(bool enable)
 {
     if (enable) {
         // Set data pins to input mode

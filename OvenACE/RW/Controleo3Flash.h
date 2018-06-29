@@ -7,7 +7,7 @@
 #ifndef CONTROLEO3FLASH_H_
 #define CONTROLEO3FLASH_H_
 
-#include "Arduino.h"
+#include <stdint.h>
 #include "bits.h"
 
 // SCK is PA13
@@ -58,7 +58,7 @@ class Controleo3Flash {
       void factoryReset();
       void erasePrefsBlock(uint8_t block);
       void eraseProfileBlock(uint16_t block);
-      void allowWritingToPrefs(boolean allow);
+      void allowWritingToPrefs(bool allow);
       uint16_t getBitmapPage(uint16_t bitmapNumber, uint16_t bitmapWidth, uint16_t bitmapHeight);
       uint16_t getBitmapInfo(uint16_t bitmapNumber, uint16_t *bitmapWidth, uint16_t *bitmapHeight);
 

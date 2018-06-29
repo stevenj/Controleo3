@@ -4,10 +4,12 @@
 //
 // Some fonts are fixed width.  This is so that when updating a field (like temperature), you can just overwrite
 // the previous number instead of erasing the number and then redrawing it.
-#include <Arduino.h>
+#include <stdint.h>
 #include "Render.h"
 #include "Bitmaps.h"
 #include "ReflowWizard.h"
+#include "printf-stdarg.h"
+#include "string.h"
 
 // Render a bitmap to the screen
 // All the bitmaps exist in external flash, but some are duplicated in microcontroller flash.
@@ -31,19 +33,19 @@ uint16_t renderBitmapFromExternalFlash(uint16_t bitmapNumber, uint16_t x, uint16
 
     // Make sure this is a valid bitmap
     if (bitmapNumber > BITMAP_LAST_ONE) {
-      SerialUSB.println("RenderBitmap: bitmap number if not valid");
+      printfD("RenderBitmap: bitmap number is not valid\n");
       return 0;
     }
 
     // Get the flash page where this bitmap is stored 
     pageWhereBitmapIsStored = flash.getBitmapInfo(bitmapNumber, &bitmapWidth, &bitmapHeight);
     if (pageWhereBitmapIsStored > 0xFFF) {
-      SerialUSB.println("RenderBitmap: pageWhereBitmapIsStored is too big");
+      printfD("RenderBitmap: pageWhereBitmapIsStored is too big\n");
       return 0;
     }
 
     if (0 && bitmapNumber >= BITMAP_LEFT_ARROW)
-      SerialUSB.println("N=" + String(bitmapNumber) + " H=" + String(bitmapHeight) + " W=" + String(bitmapWidth) + " Center=" + String((480 - bitmapWidth) >> 1));
+      printfD("N=%d H=%d W=%d Center=%d\n",bitmapNumber, bitmapHeight, bitmapWidth, ((480 - bitmapWidth) >> 1));
 
     // Calculate the number of pixels that need to be rendered
     bitmapPixels = bitmapWidth * bitmapHeight;
@@ -89,7 +91,7 @@ uint16_t renderBitmapFromMicrocontrollerFlash(uint16_t bitmapNumber, uint16_t x,
     bitmapWidth = *(fontBitmap++);
     bitmapPixels = bitmapWidth * bitmapHeight;
     if (0 && bitmapNumber >= FONT_IMAGES && bitmapNumber < BITMAP_CONVECTION_FAN1 && bitmapNumber > BITMAP_COOLING_FAN3)
-      SerialUSB.println("N=" + String(bitmapNumber) + " H=" + String(bitmapHeight) + " W=" + String(bitmapWidth) + " Center=" + String((480 - bitmapWidth) >> 1));
+      printfD("N=%d H=%d W=%d Center=%d\n", bitmapNumber, bitmapHeight,bitmapWidth, ((480 - bitmapWidth) >> 1));
 
     // Start rendering the bitmap
     tft.startBitmap(x, y, bitmapWidth, bitmapHeight);
@@ -102,14 +104,12 @@ uint16_t renderBitmapFromMicrocontrollerFlash(uint16_t bitmapNumber, uint16_t x,
 // Display a string on the screen, using the specified font
 // Only ASCII-printable character are supported
 uint16_t displayString(uint16_t x, uint16_t y, uint8_t font, char *str) {
-  boolean firstChar = true, printData = true;
+  bool firstChar = true, printData = true;
   uint16_t start = x;
   if (true /* strstr(str, "~") > 0 || strstr(str, ":") > 0 */)
     printData = false;
   else {
-    SerialUSB.print("Width of [");
-    SerialUSB.print(str);
-    SerialUSB.print("] is ");
+    printfD("Width of [%s] is ", str);
   }
   while (*str != 0) {
     if (!firstChar)
@@ -119,9 +119,9 @@ uint16_t displayString(uint16_t x, uint16_t y, uint8_t font, char *str) {
     x += postCharacterSpace(font, *str++);
   }
   if (printData) {
-    SerialUSB.print(x - start - postCharacterSpace(font, *(str-1)));
-    SerialUSB.print(". Center = ");
-    SerialUSB.println((480 - x + start + postCharacterSpace(font, *(str-1))) / 2);
+    printfD("%d. Center = %d\n", 
+      (x - start - postCharacterSpace(font, *(str-1))),
+      ((480 - x + start + postCharacterSpace(font, *(str-1))) / 2));
   }
   return x - start - postCharacterSpace(font, *(str-1));
 }
@@ -134,7 +134,7 @@ uint16_t displayCharacter(uint8_t font, uint16_t x, uint16_t y, uint8_t c)
 
   // Make sure the character can be printed
   if (!isSupportedCharacter(font, c)) {
-    SerialUSB.println("displayCharacter: Not supported");
+    printfD("displayCharacter: Not supported\n");
     return 0;
   }
     
@@ -268,7 +268,7 @@ int16_t getYOffsetForCharacter(uint8_t font, uint8_t c) {
 // Determine if the character is in the font set
 // 9 and 12-point fonts contain all printable characters
 // The 22-point font contains a small subset
-boolean isSupportedCharacter(uint8_t font, uint8_t c)
+bool isSupportedCharacter(uint8_t font, uint8_t c)
 {
   // Font must be supported
   if (font > FONT_22PT_BLACK_ON_WHITE_FIXED)
@@ -351,8 +351,7 @@ void displayFixedWidthString(uint16_t x, uint16_t y, char *str, uint8_t maxChars
 
   // Sanity check
   if (numberOfCharacters > maxChars) {
-    SerialUSB.print("displayFixedWidthString: too many characters in string ");
-    SerialUSB.println(str);
+    printfD("displayFixedWidthString: too many characters in string %s\n",str);
     return;
   }
   // What is the width of each character?
@@ -373,7 +372,7 @@ void displayFixedWidthString(uint16_t x, uint16_t y, char *str, uint8_t maxChars
 
 
 // Draw a button on the screen
-void drawButton(uint16_t x, uint16_t y, uint16_t width, uint16_t textWidth, boolean useLargeFont, char *text) {
+void drawButton(uint16_t x, uint16_t y, uint16_t width, uint16_t textWidth, bool useLargeFont, char *text) {
   drawButtonOutline(x, y, width);
   if (useLargeFont)
     displayString(x + (width >> 1) - (textWidth >> 1), y+18, FONT_12PT_BLACK_ON_WHITE, text);

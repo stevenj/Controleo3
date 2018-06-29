@@ -8,7 +8,7 @@
 #ifndef CONTROLEO3TOUCH_H_
 #define CONTROLEO3TOUCH_H_
 
-#include "Arduino.h"
+#include <stdint.h>
 #include "bits.h"
 #include "ILI9488.h"
 
@@ -53,8 +53,8 @@ class Controleo3Touch
     private:
   		volatile uint32_t *portAOut, *portAIn, *portAMode, *portBOut, *portBIn, *portBMode;
         int16_t topLeftX,topRightX,bottomLeftX,bottomRightX,topLeftY,bottomLeftY,topRightY,bottomRightY;
-		void write8(byte data);
-		word read12();
+		void write8(uint8_t data);
+		uint16_t read12();
         uint16_t calcDeviation(uint16_t *array, uint8_t num, int16_t *average);
 };
 

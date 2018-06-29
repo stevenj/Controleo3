@@ -10,6 +10,9 @@
 #include "Prefs.h"
 #include "Temperature.h"
 #include "Controleo3MAX31856.h"
+#include "rtos_support.h"
+#include <stdlib.h>
+#include "printf-stdarg.h"
 
 #define MAX_CALIBRATION_TIME  60000  // 60 seconds
 #define MAX_TAP_TARGETS    20
@@ -25,11 +28,11 @@ static struct  {
 static uint8_t touchNumTargets = 0;
 static void (*touchCallbackFunction) ();
 static uint16_t touchCallbackInterval;
-static void (*touchCallbackTemperatureUnitChange) (boolean);
+static void (*touchCallbackTemperatureUnitChange) (bool);
 static uint8_t touchScreenshotTaps = 0;
-static boolean touchDisplayInCelsius = true;
+static bool touchDisplayInCelsius = true;
 
-boolean drawTemperatureOnScreenNow;
+bool drawTemperatureOnScreenNow;
 
 // Calibrate the touch screen
 void CalibrateTouchscreen()
@@ -125,10 +128,8 @@ restart:
     // Sanity check on test point
     int16_t averageX = (topLeftX + topRightX + bottomRightX + bottomLeftX) >> 2;
     int16_t averageY = (topLeftY + topRightY + bottomRightY + bottomLeftY) >> 2;
-    SerialUSB.print(F("X delta = "));
-    SerialUSB.println(abs(averageX - centerX));
-    SerialUSB.print(F("Y delta = "));
-    SerialUSB.println(abs(averageY - centerY));
+    printfD("X delta = %d\n",abs(averageX - centerX));
+    printfD("Y delta = %d\n",abs(averageY - centerY));
     if (abs(averageX - centerX) > 60 || abs(averageY - centerY) > 60) {
       displayString(183, 240, FONT_9PT_BLACK_ON_WHITE, (char *) "Try again!");
       continue;
@@ -211,7 +212,7 @@ restart:
 
 
 // Draw the calibration crosshairs on the screen
-void drawCrosshairs(uint16_t x, uint16_t y, boolean draw)
+void drawCrosshairs(uint16_t x, uint16_t y, bool draw)
 {
   tft.fillRect(x-1, y-20, 3, 41, draw? BLUE: WHITE);
   tft.fillRect(x-20, y-1, 41, 3, draw? BLUE: WHITE);
@@ -312,7 +313,7 @@ void setTouchIntervalCallback(void (*f) (), uint16_t interval)
 
 
 // Callback function when user taps in top-right corner to change temperature units
-void setTouchTemperatureUnitChangeCallback(void (*f) (boolean displayInCelsius))
+void setTouchTemperatureUnitChangeCallback(void (*f) (bool displayInCelsius))
 {
   touchCallbackTemperatureUnitChange = f;
 }
@@ -325,7 +326,7 @@ void setTouchTemperatureUnitChangeCallback(void (*f) (boolean displayInCelsius))
 void defineTouchArea(uint16_t x, uint16_t y, uint16_t w, uint16_t h)
 {
   if (touchNumTargets >= MAX_TAP_TARGETS) {
-    SerialUSB.println("Too many tap targets!!");
+    printfD("Too many tap targets!!\n");
     return;
   }
   
@@ -346,7 +347,7 @@ int8_t getTap(uint8_t mode)
 {
   int16_t x, y;
   static uint32_t timeOfLastTemperatureUpdate = 0;
-  boolean showTemperatureInHeader = (mode == SHOW_TEMPERATURE_IN_HEADER);
+  bool showTemperatureInHeader = (mode == SHOW_TEMPERATURE_IN_HEADER);
 
   // Show the temperature in the header as soon as possible
   if (showTemperatureInHeader && drawTemperatureOnScreenNow) {

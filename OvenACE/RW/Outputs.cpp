@@ -21,13 +21,14 @@
 //  - Output 6 = PB11 (Arduino = SCK)
 //
 //  On the board (and in the build guide) the outputs are 1 through 6. In software they are 0 through 5.
-#include <Arduino.h>
+#include <stdint.h>
 
 #include "Outputs.h"
 #include "bits.h"
 #include "ReflowWizard.h"
 
 #include "SimplePIO.h"
+#include "printf-stdarg.h"
 
 // HARDWARE DEFINTIONS
 #define OUTPUT1 PA(15)
@@ -40,8 +41,9 @@
 #define HEARTBEAT_LED PA(30)  // Used as SWCLK when debugging
 #define OSERROR_LED   PA(31)  // Used as SWDIO when debugging
 
-volatile uint32_t *portAOut, *portAMode, *portBOut, *portBMode;
-static boolean outputState[NUMBER_OF_OUTPUTS];
+volatile uint32_t *portAOut, *portBOut;
+//*portAMode, *portBOut, *portBMode;
+static bool outputState[NUMBER_OF_OUTPUTS];
 
 // Initialize the registers controlling the outputs, and turn them off
 void initOutputs() {
@@ -62,20 +64,20 @@ void initOutputs() {
   //    Input Buffer Enabled (So we can read the IN Regsiter).
   //    Internal Pull Up/Down Resistor disabled.
   //    Normal Drive Strength
-  PORT_PINCFG(OUTPUT1) = (PORT_PINCFG_INEN); 
-  PORT_PINCFG(OUTPUT2) = (PORT_PINCFG_INEN); 
-  PORT_PINCFG(OUTPUT3) = (PORT_PINCFG_INEN); 
-  PORT_PINCFG(OUTPUT4) = (PORT_PINCFG_INEN); 
-  PORT_PINCFG(OUTPUT5) = (PORT_PINCFG_INEN); 
+  PORT_PINCFG_Type cfg = {
+    .bit = {
+      .PMUXEN = false,
+      .INEN = true,
+      .PULLEN = false,
+      .DRVSTR = false,
+    }
+  };
 
-  // Status LED Outputs set as:
-  //    MUX Disabled (GPIO)
-  //    Input Buffer Enabled (So we can read the IN Regsiter).
-  //    Internal Pull Up/Down Resistor disabled.
-  //    High Drive Strength (Because we are directly driving LEDs with the Output).
-  PORT_PINCFG(STATUS_LED)    = (PORT_PINCFG_INEN | PORT_PINCFG_DRVSTR); 
-  PORT_PINCFG(HEARTBEAT_LED) = (PORT_PINCFG_INEN | PORT_PINCFG_DRVSTR); 
-  PORT_PINCFG(OSERROR_LED)   = (PORT_PINCFG_INEN | PORT_PINCFG_DRVSTR); 
+  PORT_PINCFG(OUTPUT1).reg = cfg.reg; 
+  PORT_PINCFG(OUTPUT2).reg = cfg.reg; 
+  PORT_PINCFG(OUTPUT3).reg = cfg.reg; 
+  PORT_PINCFG(OUTPUT4).reg = cfg.reg; 
+  PORT_PINCFG(OUTPUT5).reg = cfg.reg; 
 
   // Set all OUTPUTS Low (Disable Relays)
   PORT_OUTPUT_LOW(PBIT(OUTPUT1) | 
@@ -91,10 +93,10 @@ void initOutputs() {
   PORT_OUTPUT_HIGH(PBIT(STATUS_LED));
 
   // Get pointer to the registers
-  portAOut   = portOutputRegister(digitalPinToPort(5));
-  portAMode  = portModeRegister(digitalPinToPort(5));
-  portBOut   = portOutputRegister(digitalPinToPort(A2));
-  portBMode  = portModeRegister(digitalPinToPort(A2)); 
+  portAOut   = &PORT_OUT(PA(0));
+//  portAMode  = portModeRegister(digitalPinToPort(5));
+  portBOut   = &PORT_OUT(PB(0));
+//  portBMode  = portModeRegister(digitalPinToPort(A2)); 
 
   // Set all I/O modes to outputs
 //  *portAMode |= SETBIT15;
@@ -102,15 +104,15 @@ void initOutputs() {
 
   // Set all outputs low (turn off relays)
 //  for (int i=0; i<=NUMBER_OF_OUTPUTS; i++)
-//    setOutput(i, LOW);
+//    setOutput(i, 0);
 }
 
 
 // Turn an output on or off
-void setOutput(uint8_t outputNumber, boolean state) {
+void setOutput(uint8_t outputNumber, bool state) {
   // Make sure it is a valid output
   if (outputNumber > NUMBER_OF_OUTPUTS) {
-    SerialUSB.println("setOutput: outputNumber is not in range!");
+    printfD("setOutput: outputNumber is not in range!\n");
     return;
   }
 
@@ -119,42 +121,42 @@ void setOutput(uint8_t outputNumber, boolean state) {
   
   switch (outputNumber) {
     case 0: 
-      if (state == LOW)
+      if (state == 0)
         *portAOut &= CLEARBIT15;
       else
         *portAOut |= SETBIT15; 
       break;
     
     case 1: 
-      if (state == LOW)
+      if (state == 0)
         *portBOut &= CLEARBIT30;
       else
         *portBOut |= SETBIT30; 
       break;
     
     case 2: 
-      if (state == LOW)
+      if (state == 0)
         *portBOut &= CLEARBIT17;
       else
         *portBOut |= SETBIT17; 
       break;
     
     case 3: 
-      if (state == LOW)
+      if (state == 0)
         *portBOut &= CLEARBIT09;
       else
         *portBOut |= SETBIT09; 
       break;
     
     case 4: 
-      if (state == LOW)
+      if (state == 0)
         *portBOut &= CLEARBIT08;
       else
         *portBOut |= SETBIT08; 
       break;
     
     case 5: 
-      if (state == LOW)
+      if (state == 0)
         *portBOut &= CLEARBIT11;
       else
         *portBOut |= SETBIT11; 
@@ -164,11 +166,11 @@ void setOutput(uint8_t outputNumber, boolean state) {
 
 
 // Get the current state of an output
-boolean getOutput(uint8_t outputNumber)
+bool getOutput(uint8_t outputNumber)
 {
   // Make sure it is a valid output
   if (outputNumber > NUMBER_OF_OUTPUTS) {
-    SerialUSB.println("getOutput: outputNumber is not in range!");
+    printfD("getOutput: outputNumber is not in range!\n");
     return false;
   }
   return outputState[outputNumber];
@@ -176,7 +178,7 @@ boolean getOutput(uint8_t outputNumber)
 
 
 // Turn elements and fans on or off in one go
-void setOvenOutputs(boolean elementsOn, boolean convectionFanOn, boolean coolingFanOn)
+void setOvenOutputs(bool elementsOn, bool convectionFanOn, bool coolingFanOn)
 {
   for (uint8_t i=0; i< NUMBER_OF_OUTPUTS; i++) {
     switch (prefs.outputType[i]) {
@@ -191,7 +193,7 @@ void setOvenOutputs(boolean elementsOn, boolean convectionFanOn, boolean cooling
       default:
         // This can only be used to turn the elements off
         if (!elementsOn)
-          setOutput(i, LOW);
+          setOutput(i, 0);
         break;
     }
   }
@@ -199,7 +201,7 @@ void setOvenOutputs(boolean elementsOn, boolean convectionFanOn, boolean cooling
 
 
 // Turn the convection fan on or off
-void turnConvectionFanOn(boolean on)
+void turnConvectionFanOn(bool on)
 {
   for (uint8_t i=0; i< NUMBER_OF_OUTPUTS; i++) {
     if (prefs.outputType[i] == TYPE_CONVECTION_FAN)
@@ -209,7 +211,7 @@ void turnConvectionFanOn(boolean on)
 
 
 // Turn the cooling fan on or off
-void turnCoolingFanOn(boolean on)
+void turnCoolingFanOn(bool on)
 {
   for (uint8_t i=0; i< NUMBER_OF_OUTPUTS; i++) {
     if (prefs.outputType[i] == TYPE_COOLING_FAN)
@@ -220,7 +222,7 @@ void turnCoolingFanOn(boolean on)
 
 // Check to see if outputs are configured.  Prevent bake/reflow if not
 // At least 2 elements must be heating elements
-boolean areOutputsConfigured()
+bool areOutputsConfigured()
 {
   uint8_t numberConfigured = 0;
   for (uint8_t i=0; i< NUMBER_OF_OUTPUTS; i++) {

@@ -1,7 +1,7 @@
 #ifndef __PREFS_H__
 #define __PREFS_H__
 
-#include <Arduino.h>
+#include <stdint.h>
 
 void getPrefs(void);
 
@@ -15,6 +15,6 @@ void checkIfPrefsShouldBeWrittenToFlash(void);
 void writePrefsToFlash(void);
 
 // This performs a factory reset, erasing preferences and profiles
-void factoryReset(boolean saveTouchCalibrationData);
+void factoryReset(bool saveTouchCalibrationData);
 
 #endif

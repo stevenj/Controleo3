@@ -1,7 +1,7 @@
 #ifndef __HELP_H__
 #define __HELP_H__
 
-#include <Arduino.h>
+#include <stdint.h>
 
 void showHelp(uint8_t screen);
 

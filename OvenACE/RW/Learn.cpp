@@ -16,6 +16,10 @@
 #include "Utility.h"
 #include "Servo.h"
 #include "Tones.h"
+#include "rtos_support.h"
+#include "string.h"
+#include "ArduinoDefs.h"
+#include "stdio.h"
 
 #define LEARNING_PHASE_INITIAL_RAMP         0
 #define LEARNING_PHASE_CONSTANT_TEMP        1
@@ -45,12 +49,12 @@ void learn() {
   uint8_t currentlyMeasuring = TYPE_WHOLE_OVEN;
   double currentTemperature = 0, peakTemperature = 0, desiredTemperature = LEARNING_INERTIA_TEMP;
   uint8_t elementDutyCounter[NUMBER_OF_OUTPUTS];
-  boolean isOneSecondInterval = false;
+  bool isOneSecondInterval = false;
   uint16_t iconsX, i;
   uint8_t learningDutyCycle, learningIntegral = 0, coolingDuration = 0;
-  boolean isHeating = true;
+  bool isHeating = true;
   long lastOverTempTime = 0;
-  boolean abortDialogIsOnScreen = false;
+  bool abortDialogIsOnScreen = false;
   
   // Verify the outputs are configured
   if (areOutputsConfigured() == false) {
@@ -182,8 +186,8 @@ userChangedMindAboutAborting:
       }
     
       // Abort the bake
-      SerialUSB.println("Thermocouple error:" + String(buffer100Bytes));
-      SerialUSB.println("Learning aborted because of thermocouple error!");
+      printf("Thermocouple error:%s\n", buffer100Bytes);
+      printf("Learning aborted because of thermocouple error!\n");
       // Show the error on the screen
       drawThickRectangle(0, 90, 480, 230, 15, RED);
       tft.fillRect(30, 105, 420, 115, WHITE);
@@ -222,7 +226,7 @@ userChangedMindAboutAborting:
           learningDutyCycle = 30;
         if (i < 20) {
           learningPhase = LEARNING_PHASE_CONSTANT_TEMP;
-          SerialUSB.println("learningPhase -> LEARNING_PHASE_CONSTANT_TEMP");
+          printf("learningPhase -> LEARNING_PHASE_CONSTANT_TEMP\n");
           learningDutyCycle = 15;
           secondsIntoPhase = 0;
         }
@@ -284,7 +288,7 @@ userChangedMindAboutAborting:
 
             // Reset the bake integral, so it will be slow to increase the duty cycle again
             learningIntegral = 0;
-            SerialUSB.println("Over-temp. Elements off");
+            printf("Over-temp. Elements off\n");
           }
         }
         else {
@@ -303,7 +307,7 @@ userChangedMindAboutAborting:
             // Increase duty cycles
             if (learningDutyCycle < 100)
               learningDutyCycle++;
-            SerialUSB.println("Under-temp. Increasing duty cycle");
+            printf("Under-temp. Increasing duty cycle\n");
           }
         }
         
@@ -471,7 +475,7 @@ userChangedMindAboutAborting:
 
           // Reset the bake integral, so it will be slow to increase the duty cycle again
           learningIntegral = 0;
-          SerialUSB.println("Over-temp. Elements off");
+          printf("Over-temp. Elements off\n");
         }
 
         // Is the oven below temperature?
@@ -489,7 +493,7 @@ userChangedMindAboutAborting:
             // Increase duty cycles
             if (learningDutyCycle < 100)
               learningDutyCycle++;
-            SerialUSB.println("Under-temp. Increasing duty cycle");
+            printf("Under-temp. Increasing duty cycle\n");
           } 
         }
         break;
@@ -540,7 +544,7 @@ userChangedMindAboutAborting:
         break;
 
       case LEARNING_PHASE_ABORT:
-        SerialUSB.println("Learning is over!");
+        printf("Learning is over!\n");
         // Turn all elements and fans off
         setOvenOutputs(ELEMENTS_OFF, CONVECTION_FAN_OFF, COOLING_FAN_OFF);
         // Close the oven door now, over 3 seconds
@@ -556,27 +560,27 @@ userChangedMindAboutAborting:
           case TYPE_TOP_ELEMENT:
             // Turn the output on at 0, and off at the duty cycle value
             if (elementDutyCounter[i] == 0 && (currentlyMeasuring == TYPE_WHOLE_OVEN || currentlyMeasuring == TYPE_TOP_ELEMENT))
-              setOutput(i, HIGH);
+              setOutput(i, 1);
             // Restrict the top element's duty cycle to 80% to protect the insulation
             // and reduce IR heating of components
             if (elementDutyCounter[i] == (learningDutyCycle < 80? learningDutyCycle: 80))
-              setOutput(i, LOW);
+              setOutput(i, 0);
             break;
           case TYPE_BOTTOM_ELEMENT:
             // Turn the output on at 0, and off at the duty cycle value
             if (elementDutyCounter[i] == 0 && (currentlyMeasuring == TYPE_WHOLE_OVEN || currentlyMeasuring == TYPE_BOTTOM_ELEMENT))
-              setOutput(i, HIGH);
+              setOutput(i, 1);
             if (elementDutyCounter[i] == learningDutyCycle)
-              setOutput(i, LOW);
+              setOutput(i, 0);
             break;
           
           case TYPE_BOOST_ELEMENT: 
             // Give it half the duty cycle of the other elements
             // Turn the output on at 0, and off at the duty cycle value
             if (elementDutyCounter[i] == 0 && currentlyMeasuring == TYPE_WHOLE_OVEN)
-              setOutput(i, HIGH);
+              setOutput(i, 1);
             if (elementDutyCounter[i] == learningDutyCycle/2)
-              setOutput(i, LOW);
+              setOutput(i, 0);
           break;
         }
       
@@ -594,8 +598,7 @@ userChangedMindAboutAborting:
 void DisplayLearningTime(uint16_t duration, float temperature, int duty, int integral) {
   // Write the time and temperature to the serial port, for graphing or analysis on a PC
   uint16_t fraction = ((uint16_t) (temperature * 100)) % 100;
-  sprintf(buffer100Bytes, "%u, %d.%02d, %i, %i", duration, (uint16_t) temperature, fraction, duty, integral);
-  SerialUSB.println(buffer100Bytes);
+  printf("%u, %d.%02d, %i, %i\n", duration, (uint16_t) temperature, fraction, duty, integral);
 }
 
 
@@ -640,7 +643,7 @@ void displaySecondsLeft(uint32_t overallSeconds, uint32_t phaseSeconds)
 #define PERFORMANCE_GOOD              0x5F0B  // (tft.convertTo16Bit(0x5EE05F))
 
 // Draw the performance graph to indicate instantaneous performance
-void drawPerformanceBar(boolean redraw, uint8_t percentage)
+void drawPerformanceBar(bool redraw, uint8_t percentage)
 {
   static uint16_t lastStatusX = 0;
 

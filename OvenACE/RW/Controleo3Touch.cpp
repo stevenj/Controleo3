@@ -13,18 +13,21 @@
 #define TOUCH_DEBUG
 
 #include "Controleo3Touch.h"
+#include "SimplePIO.h"
+#include "ArduinoDefs.h"
+#include "printf-stdarg.h"
 
 Controleo3Touch::Controleo3Touch()
 {
     // Get the addresses of Port A (D2 is on port A)
-    portAOut   = portOutputRegister(digitalPinToPort(2));
-    portAIn    = portInputRegister(digitalPinToPort(2));
-    portAMode  = portModeRegister(digitalPinToPort(2));
+    portAOut   = &PORT_OUT(PA(0));
+    portAIn    = &PORT_IN(PA(0));
+    portAMode  = &PORT_DIR(PA(0));
 
     // Get the addresses of Port B (A2 is on port B)
-    portBOut   = portOutputRegister(digitalPinToPort(A2));
-    portBIn    = portInputRegister(digitalPinToPort(A2));
-    portBMode  = portModeRegister(digitalPinToPort(A2));
+    portBOut   = &PORT_OUT(PB(0));
+    portBIn    = &PORT_IN(PB(0));
+    portBMode  = &PORT_DIR(PB(0));
 }
 
 
@@ -56,14 +59,8 @@ void Controleo3Touch::calibrate(int16_t tlX,int16_t trX,int16_t blX,int16_t brX,
     topRightY = trY;
     bottomRightY = brY;
 #ifdef TOUCH_DEBUG
-    SerialUSB.print("Touch data: tlX=" + String(tlX));
-    SerialUSB.print(" trX=" + String(trX));
-    SerialUSB.print(" blX=" + String(blX));
-    SerialUSB.print(" brX=" + String(brX));
-    SerialUSB.print(" tlY=" + String(tlY));
-    SerialUSB.print(" blY=" + String(blY));
-    SerialUSB.print(" trY=" + String(trY));
-    SerialUSB.println(" brY=" + String(brY));
+    printfD("Touch data: tlX=%d trX=%d blX=%d brX=%d tlY=%d blY=%d trY=%d brY=%d\n",
+            tlX,trX,blX,brX,tlY,blY,trY,brY);
 #endif
 }
 
@@ -118,10 +115,7 @@ bool Controleo3Touch::readRaw(int16_t *x, int16_t *y)
       return false;
 
 #ifdef TOUCH_DEBUG
-    SerialUSB.print("X = ");
-    SerialUSB.print(*x);
-    SerialUSB.print("   Y = ");
-    SerialUSB.println(*y);
+    printfD("X = %d  Y = %d\n", *x, *y);
 #endif
     return true;
 }
@@ -170,9 +164,9 @@ uint16_t Controleo3Touch::calcDeviation(uint16_t *array, uint8_t num, int16_t *a
 
 
 // Write 8 bits of data to the IC
-void Controleo3Touch::write8(byte data)
+void Controleo3Touch::write8(uint8_t data)
 {
-	for (byte count=0; count<8; count++)
+	for (uint8_t count=0; count<8; count++)
 	{
 		if (data & 0x80)
 			TOUCH_MOSI_ACTIVE;
@@ -189,7 +183,7 @@ uint16_t Controleo3Touch::read12()
 {
 	uint16_t data = 0;
 
-	for (byte count=0; count<12; count++)
+	for (uint8_t count=0; count<12; count++)
 	{
 		data <<= 1;
 		TOUCH_PULSE_CLK;

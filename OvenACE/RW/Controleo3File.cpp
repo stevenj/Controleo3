@@ -13,6 +13,8 @@
  */
 
 #include "Controleo3SD.h"
+#include "string.h"
+#include "ArduinoDefs.h"
 
 /* for debugging file open/close leaks
    uint8_t nfilecount=0;
@@ -49,7 +51,7 @@ char *File::name(void) {
 }
 
 // a directory is a special type of file
-boolean File::isDirectory(void) {
+bool File::isDirectory(void) {
   return (_file && _file->isDir());
 }
 
@@ -68,12 +70,12 @@ size_t File::write(const uint8_t *buf, size_t size) {
     setWriteError();
     return 0;
   }
-  _file->clearWriteError();
+  //TODO: _file->clearWriteError();
   t = _file->write(buf, size);
-  if (_file->getWriteError()) {
-    setWriteError();
-    return 0;
-  }
+  //TODO:if (_file->getWriteError()) {
+  //TODO:  setWriteError();
+  //TODO:  return 0;
+  //TODO:}
   return t;
 }
 
@@ -112,7 +114,7 @@ void File::flush() {
     _file->sync();
 }
 
-boolean File::seek(uint32_t pos) {
+bool File::seek(uint32_t pos) {
   if (! _file) return false;
 
   return _file->seekSet(pos);

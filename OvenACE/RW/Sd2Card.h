@@ -8,7 +8,7 @@
 
 #ifndef SD2CARD_H_
 #define SD2CARD_H_
-#include <Arduino.h>
+#include <stdint.h>
 #include "SdInfo.h"
 #include "bits.h"
 

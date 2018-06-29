@@ -7,7 +7,7 @@
 #ifndef CONTROLEO3LCD_H_
 #define CONTROLEO3LCD_H_
 
-#include "Arduino.h"
+#include <stdint.h>
 #include "bits.h"
 #include "ILI9488.h"
 
@@ -108,12 +108,12 @@ class Controleo3LCD
 	private:
 		void setAddrWindow(int x1, int y1, int x2, int y2);
 		void flood(uint16_t color, uint32_t len);
-    void readMode(boolean enable);
-    uint8_t read8Data();
+    	void readMode(bool enable);
+    	uint8_t read8Data();
 		volatile uint32_t *portBOut, *portBMode, *portBIn;
-    volatile uint8_t *flood8Reg;
-    volatile uint16_t *bitmapReg;
-    uint16_t bitmapRegValue;
+    	volatile uint8_t *flood8Reg;
+    	volatile uint16_t *bitmapReg;
+    	uint16_t bitmapRegValue;
 		void checkRange(int val, int low, int high, char *msg);
 };
 

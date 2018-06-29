@@ -43,6 +43,10 @@
 #include "bits.h"
 #include "Prefs.h"
 #include "Temperature.h"
+#include "SimplePIO.h"
+#include "ArduinoDefs.h"
+#include "stdio.h"
+#include "printf-stdarg.h"
 
 #define MIN_PULSE_WIDTH        800     // The shortest pulse (nanoseconds) sent to a servo (The Arduino servo library has 544)
 #define MAX_PULSE_WIDTH        2200    // The longest pulse (nanoseconds) sent to a servo (The Arduino servo library has 2400)
@@ -170,8 +174,7 @@ void TC3_Handler()
 // Move the servo to servoDegrees, in timeToTake milliseconds (1/1000 second)
 void setServoPosition(uint8_t servoDegrees, uint16_t timeToTake) {
   TcCount16* TC = (TcCount16*) TC3;     // Get timer struct
-  sprintf(buffer100Bytes, "Servo: move to %d degrees, over %d ms", servoDegrees, timeToTake);
-  SerialUSB.println(buffer100Bytes);
+  printfD("Servo: move to %d degrees, over %d ms\n", servoDegrees, timeToTake);
   // Make sure the degrees are 0 - 180
   if (servoDegrees > 180)
     return;

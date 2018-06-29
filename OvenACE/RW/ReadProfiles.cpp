@@ -6,6 +6,13 @@
 #include "ReflowWizard.h"
 #include "Render.h"
 #include "Prefs.h"
+#include "printf-stdarg.h"
+#include "rtos_support.h"
+#include "stdio.h"
+#include "string.h"
+#include "ctype.h"
+
+#include "ArduinoDefs.h"
 
 uint8_t flashBuffer256Bytes[256];     // Read/write from flash.  This is the size of a flash block
 
@@ -24,27 +31,27 @@ char *tokenPtr[NUM_TOKENS];
 void ReadProfilesFromSDCard()
 {
   // Don't do anything if there isn't a SD card
-  if (digitalRead(A0) == HIGH)
+  if (digitalRead(A0) == 1)
     return;
-  SerialUSB.println("SD card is present");
+  printfD("SD card is present\n");
 
   // Initialize the SD card
-  SerialUSB.println("Initializing SD card...");
+  printfD("Initializing SD card...\n");
   // Try initializing twice.  Necessary if good card follows bad one
   if (!SD.begin() && !SD.begin()) {
-    SerialUSB.println((char *) "Card failed, or not present");
-    SerialUSB.println((char *) "Error! Is SD card FAT16 or FAT32?");
+    printfD((char *) "Card failed, or not present\n");
+    printfD((char *) "Error! Is SD card FAT16 or FAT32?\n");
     tft.fillRect(20, 120, 440, 40, WHITE);
-    displayString(24, 120, FONT_9PT_BLACK_ON_WHITE, (char *) "Error! Is SD card FAT16 or FAT32?");
+    displayString(24, 120, FONT_9PT_BLACK_ON_WHITE, (char *) "Error! Is SD card FAT16 or FAT32?\n");
     uint32_t start = millis();
     // Display the message for 3 seconds, or until the SD card is removed
-    while (digitalRead(A0) == LOW && millis() - start < 3000)
+    while (digitalRead(A0) == 0 && millis() - start < 3000)
       delay(20);
     tft.fillRect(20, 120, 440, 40, WHITE);
     // Don't do anything more
     return;
   }
-  SerialUSB.println("SD Card initialized");
+  printfD("SD Card initialized\n");
 
   // Open the root folder to look for files
   File root = SD.open("/");
@@ -100,7 +107,7 @@ void processFile(File file)
     return;
 
   // Looks like this is a valid profile file
-  SerialUSB.println("Processing file: " + String(file.name()));
+  printfD("Processing file: %s\n", file.name());
 
   // Reset the token search
   initTokenPtrs();
@@ -120,12 +127,12 @@ void processFile(File file)
       case TOKEN_NAME:
         // Has a name been extracted from the file already?
         if (newProfile) {
-          SerialUSB.println("Profile has more than one name!");
+          printfD("Profile has more than one name!\n");
           goto tokenError;
         }
         // Get the name of the profile
         if (!getStringFromFile(file, buffer100Bytes, MAX_PROFILE_NAME_LENGTH)) {
-          SerialUSB.println("Unable to find profile name");
+          printfD("Unable to find profile name\n");
           goto tokenError;
         }
 
@@ -134,7 +141,7 @@ void processFile(File file)
 
         // Is there a spare profile slot?
         if (prefs.numProfiles >= MAX_PROFILES) {
-          SerialUSB.println("No space to store profile");
+          printfD("No space to store profile\n");
           goto tokenError;
         }
 
@@ -172,7 +179,7 @@ void processFile(File file)
       case TOKEN_DISPLAY:
         // This should be followed by a string that should be displayed
         if (!getStringFromFile(file, buffer100Bytes, MAX_PROFILE_DISPLAY_STR)) {
-          SerialUSB.println("Error getting display string");
+          printfD("Error getting display string\n");
           goto tokenError;
         }
         // Save the display string
@@ -185,15 +192,15 @@ void processFile(File file)
       case TOKEN_BIAS:
         // This should be followed by 3 numbers, indicating bottom/top/boost
         if (!getNumberFromFile(file, &numbers[0])) {
-          SerialUSB.println("Error getting number 1/3");
+          printfD("Error getting number 1/3\n");
           goto tokenError;
         }
         if (!getNumberFromFile(file, &numbers[1])) {
-          SerialUSB.println("Error getting number 2/3");
+          printfD("Error getting number 2/3\n");
           goto tokenError;
         }
         if (!getNumberFromFile(file, &numbers[2])) {
-          SerialUSB.println("Error getting number 3/3");
+          printfD("Error getting number 3/3\n");
           goto tokenError;
         }
         // Save the token and numbers to flash
@@ -206,11 +213,11 @@ void processFile(File file)
       case TOKEN_MAINTAIN_TEMP:
         // These should be followed by 2 numbers
         if (!getNumberFromFile(file, &numbers[0])) {
-          SerialUSB.println("Error getting number 1/2");
+          printfD("Error getting number 1/2\n");
           goto tokenError;
         }
         if (!getNumberFromFile(file, &numbers[1])) {
-          SerialUSB.println("Error getting number 2/2");
+          printfD("Error getting number 2/2\n");
           goto tokenError;
         }
         // Save the token and numbers to flash
@@ -231,7 +238,7 @@ void processFile(File file)
       case TOKEN_WAIT_UNTIL_BELOW_C:
         // These require 1 parameter
         if (!getNumberFromFile(file, &numbers[0])) {
-          SerialUSB.println("Error getting number");
+          printfD("Error getting number\n");
           goto tokenError;
         }
         // Save the oven open/close to flash
@@ -278,7 +285,7 @@ tokenError:
 
   // Save the profiles
   savePrefs();
-  SerialUSB.println("Error processing file - discarded");
+  printfD("Error processing file - discarded\n");
 }
 
 
@@ -321,9 +328,9 @@ uint8_t hasTokenBeenFound(char c)
 // Return false if the end-of-file is reached before the second double-quote is read.
 // Only save up to the maximum string length, and ignore (discard) any characters over
 // the maximum length
-boolean getStringFromFile(File file, char *strBuffer, uint8_t maxLength)
+bool getStringFromFile(File file, char *strBuffer, uint8_t maxLength)
 {
-  boolean doubleQuoteFound = false;
+  bool doubleQuoteFound = false;
   char c;
 
   // Empty string so far
@@ -347,7 +354,7 @@ boolean getStringFromFile(File file, char *strBuffer, uint8_t maxLength)
 
     // Have we come to the end of the line without finding a double-quote?
     if (c == 0x0A || c == 0x0D) {
-      SerialUSB.println("Missing double-quote of string");
+      printfD("Missing double-quote of string\n");
       return false;
     }
     
@@ -366,9 +373,9 @@ boolean getStringFromFile(File file, char *strBuffer, uint8_t maxLength)
 // reads until it finds a digit, and continues until it finds something that isn't a
 // digit.  This reads uint16_t numbers, so they are limited to 65,536 (2^16).
 // Return false if the end-of-file is reached before the number is found.
-boolean getNumberFromFile(File file, uint16_t *num)
+bool getNumberFromFile(File file, uint16_t *num)
 {
-  boolean digitFound = false;
+  bool digitFound = false;
   char c;
 
   *num = 0;
@@ -379,7 +386,7 @@ boolean getNumberFromFile(File file, uint16_t *num)
     if (!digitFound) {
       // Have we come to the end of the line without finding a digit?
       if (c == 0x0A || c == 0x0D) {
-        SerialUSB.println("Can't find number");
+        printfD("Can't find number\n");
         return false;
       }
 
@@ -404,7 +411,7 @@ boolean getNumberFromFile(File file, uint16_t *num)
   
   // We've reached the end of the file
   if (digitFound) {
-      SerialUSB.println("Found number " + String(*num));
+      printfD("Found number %d\n", *num);
       return true;
   }
   return false;
@@ -506,7 +513,7 @@ void initProfileWriteToFlash(uint16_t startingBlock) {
 void saveTokenAndNumbersToFlash(uint8_t token, uint16_t *numbers, uint8_t numOfNumbers)
 {
   // Show the token being written for debugging
-  SerialUSB.println(tokenToText(buffer100Bytes, token, numbers));
+  printfD("%s\n", tokenToText(buffer100Bytes, token, numbers));
 
   // Is this the end of the block?
   if (offsetIntoBlock > (256 - MAX_TOKEN_LENGTH)) {
@@ -529,7 +536,7 @@ void saveTokenAndNumbersToFlash(uint8_t token, uint16_t *numbers, uint8_t numOfN
 void saveTokenAndStringToFlash(uint16_t token, char *str)
 {
   // Show the token being written for debugging
-  SerialUSB.println("Display \"" + String(str) + "\"");
+  printfD("Display \"%s\"/n", str);
 
   // Is this the end of the block?
   if (offsetIntoBlock > (256 - MAX_TOKEN_LENGTH)) {
@@ -546,7 +553,7 @@ void saveTokenAndStringToFlash(uint16_t token, char *str)
 
 
 // Write the 256-byte profile block to flash
-boolean writeTokenBufferToFlash(boolean endOfProfile)
+bool writeTokenBufferToFlash(bool endOfProfile)
 {
   // Is this the end of the profile?
   if (endOfProfile)
@@ -562,7 +569,7 @@ boolean writeTokenBufferToFlash(boolean endOfProfile)
     flash.write(startFlashBlock + numBlocksUsed, 256, flashBuffer256Bytes);
     // Protect flash again
     flash.allowWritingToPrefs(false);
-    SerialUSB.println("Wrote profile flash block " + String(startFlashBlock + numBlocksUsed) + "   size (bytes) = " + String(offsetIntoBlock));
+    printfD("Wrote profile flash block %d size (bytes) = %d", (startFlashBlock + numBlocksUsed), offsetIntoBlock);
   }
 
   // Initialize all the variables used to store the tokens
@@ -571,7 +578,7 @@ boolean writeTokenBufferToFlash(boolean endOfProfile)
   memset(flashBuffer256Bytes, 0, 256);
 
   if (numBlocksUsed > 16) {
-    SerialUSB.println("ERROR: Some tokens have been discarded!  Profile file is too long");
+    printfD("ERROR: Some tokens have been discarded!  Profile file is too long\n");
     return false;
   }
   return true;
@@ -595,12 +602,12 @@ uint16_t getNextTokenFromFlash(char *str, uint16_t *num)
 
     // Is the block number good?
     if ((startBlock & 0x0F) || startBlock < 64) {
-      SerialUSB.println("getNextTokenFromFlash: Profile block number out of range " + String(startBlock));
+      printfD("getNextTokenFromFlash: Profile block number out of range %d\n", startBlock);
       return TOKEN_END_OF_PROFILE;
     }
 
     // Read the first block from flash into memory
-    SerialUSB.println("getNextTokenFromFlash: Reading first block " + String(startBlock));
+    printfD("getNextTokenFromFlash: Reading first block %d\n", startBlock);
     flash.startRead(startBlock, 256, flashBuffer256Bytes);
     flash.endRead();
 
@@ -664,12 +671,12 @@ uint16_t getNextTokenFromFlash(char *str, uint16_t *num)
     case TOKEN_NEXT_FLASH_BLOCK:
       // Sanity check
       if (blocksRead++ >= 16) {
-        SerialUSB.println("getNextTokenFromFlash: Too many blocks");
+        printfD("getNextTokenFromFlash: Too many blocks\n");
         token = TOKEN_END_OF_PROFILE;
         break;
       }
       // Read the next block from flash into memory
-//      SerialUSB.println("getNextTokenFromFlash: Reading extra block " + String(startBlock+ blocksRead));
+//      printfD("getNextTokenFromFlash: Reading extra block " + String(startBlock+ blocksRead));
       flash.startRead(startBlock + blocksRead, 256, flashBuffer256Bytes);
       flash.endRead();
       offset = 0;
@@ -677,7 +684,7 @@ uint16_t getNextTokenFromFlash(char *str, uint16_t *num)
 
     default:
       // Should never get here
-      SerialUSB.println("getNextTokenFromFlash: Unknown token " + String(token));
+      printfD("getNextTokenFromFlash: Unknown token %d\n", token);
       token = TOKEN_END_OF_PROFILE;
       break;
   }
@@ -701,7 +708,7 @@ void dumpProfile(uint8_t profileNo)
   if (getNextTokenFromFlash(0, &block) == TOKEN_END_OF_PROFILE)
     return;
 
-  SerialUSB.println("---- Start of profile ----");
+  printfD("---- Start of profile ----\n");
 
   while (1) {
     // Get the next token
@@ -710,21 +717,21 @@ void dumpProfile(uint8_t profileNo)
     // Display the token and parameters
     switch (token) {
       case TOKEN_DISPLAY:
-        SerialUSB.println("Display \"" + String(buffer100Bytes) + "\"");
+        printfD("Display \"%s\"\n", buffer100Bytes);
         break;
 
       case TOKEN_MAX_DUTY:
       case TOKEN_ELEMENT_DUTY_CYCLES:
       case TOKEN_BIAS:
         // This should be followed by 3 numbers, indicating bottom/top/boost
-        SerialUSB.println(tokenToText(buffer100Bytes, token, numbers));
+        printfD("%s\n", tokenToText(buffer100Bytes, token, numbers));
         break;
  
       case TOKEN_TEMPERATURE_TARGET:
       case TOKEN_OVEN_DOOR_PERCENT:
       case TOKEN_MAINTAIN_TEMP:
         // These should be followed by 2 numbers
-        SerialUSB.println(tokenToText(buffer100Bytes, token, numbers));
+        printfD("%s\n", tokenToText(buffer100Bytes, token, numbers));
         break;
 
       case TOKEN_DEVIATION:
@@ -736,7 +743,7 @@ void dumpProfile(uint8_t profileNo)
       case TOKEN_WAIT_UNTIL_ABOVE_C:
       case TOKEN_WAIT_UNTIL_BELOW_C:
         // These require 1 parameter
-        SerialUSB.println(tokenToText(buffer100Bytes, token, numbers));
+        printfD("%s\n", tokenToText(buffer100Bytes, token, numbers));
         break;
           
       case TOKEN_START_TIMER:
@@ -748,16 +755,16 @@ void dumpProfile(uint8_t profileNo)
       case TOKEN_PLAY_DONE_TUNE:
       case TOKEN_PLAY_BEEP:
         // These don't take parameters
-        SerialUSB.println(tokenToText(buffer100Bytes, token, numbers));
+        printfD("%s\n", tokenToText(buffer100Bytes, token, numbers));
         break;
 
       case TOKEN_END_OF_PROFILE:
-        SerialUSB.println("---- End of profile ----");
+        printfD("---- End of profile ----\n");
         return;
 
       default:
         // Should never get here
-        SerialUSB.println("dumpProfile: Unknown token");
+        printfD("dumpProfile: Unknown token\n");
         return;
     }
   }
@@ -765,7 +772,7 @@ void dumpProfile(uint8_t profileNo)
 
 
 // Return true if a profile of the same name exists
-boolean profileExists(char *profileName)
+bool profileExists(char *profileName)
 {
   for (uint8_t i = 0; i< prefs.numProfiles; i++) {
     if (strcmp(profileName, prefs.profile[i].name) == 0)
@@ -778,10 +785,10 @@ boolean profileExists(char *profileName)
 // Delete profiles having the same name so you don't get duplicates
 void deleteProfileByName(char *profileName)
 {
-  SerialUSB.println("Looking to delete profile: " + String(profileName));
+  printfD("Looking to delete profile: %s\n", profileName);
   for (uint8_t i = 0; i< prefs.numProfiles; i++) {
     if (strcmp(profileName, prefs.profile[i].name) == 0) {
-      SerialUSB.println("Deleting profile " + String(i));
+      printfD("Deleting profile %d\n", i);
       deleteProfile(i);
       return;
     }
@@ -794,7 +801,7 @@ void deleteProfileByName(char *profileName)
 uint16_t getFreeProfileBlock()
 {
   uint16_t flashBlock = prefs.lastUsedProfileBlock;
-  boolean blockIsUsed;
+  bool blockIsUsed;
   
   // Make sure there should be a free block
   if (prefs.numProfiles >= MAX_PROFILES)
@@ -820,13 +827,13 @@ uint16_t getFreeProfileBlock()
 
     // If this block isn't being used then bingo!
     if (!blockIsUsed) {
-      SerialUSB.println("Next unused flash block = " + String(flashBlock));
+      printfD("Next unused flash block = %d\n", flashBlock);
       return flashBlock;
     }
   }
 
   // We should never get here unless there is a terrible mess in flash
-  SerialUSB.println("REALLY BAD: NO FREE FLASH BLOCK!");
+  printfD("REALLY BAD: NO FREE FLASH BLOCK!\n");
   return 0;
 }
 
@@ -844,7 +851,7 @@ void sortProfiles(void)
         continue;
       // If the first profile is not valid then switch them
       if (prefs.profile[i].startBlock == 0) {
-        SerialUSB.println("Moving " + String(prefs.profile[j].name) + " (" + String(j) + ") to " + String(i));
+        printfD("Moving %s (%d) to (%d)\n", prefs.profile[j].name, j, i);
         // Copy one block to the other
         memcpy(&prefs.profile[i], &prefs.profile[j], sizeof(struct profiles));
         // Zero out the old profile
@@ -855,13 +862,13 @@ void sortProfiles(void)
       if (strcmp(prefs.profile[i].name, prefs.profile[j].name) <= 0)
         continue;
       // Swap the profiles
-      SerialUSB.println("Swapping " + String(prefs.profile[i].name) + " (" + String(i) + " and " + String(j) + ")");
+      printfD("Swapping %s (%d and %d)\n", prefs.profile[i].name, i, j);
       memcpy(&temp, &prefs.profile[i], sizeof(struct profiles));
       memcpy(&prefs.profile[i], &prefs.profile[j], sizeof(struct profiles));
       memcpy(&prefs.profile[j], &temp, sizeof(struct profiles));
     }
   }
-  SerialUSB.println("Profiles have been sorted");
+  printfD("Profiles have been sorted\n");
   prefs.numProfiles = getNumberOfProfiles();
 }
 
@@ -886,7 +893,7 @@ void deleteProfile(uint8_t num)
   prefs.numProfiles = getNumberOfProfiles();
   // Save the prefs
   savePrefs();
-  SerialUSB.println("Deleted profile " + String(num) + "  No. of profiles=" + String(prefs.numProfiles));
+  printfD("Deleted profile %d  No. of profiles= %d\n", num, prefs.numProfiles);
 }
 
 

@@ -2,10 +2,12 @@
 // Released under CC BY-NC-SA 3.0 license
 // Build a reflow oven: http://whizoo.com
 //
-#include <Arduino.h>
+#include <stdint.h>
 #include "Temperature.h"
 #include "ReflowWizard.h"
 #include "Controleo3MAX31856.h"
+#include "rtos_support.h"
+#include "stdio.h"
 
 #define CR0_INIT  (CR0_AUTOMATIC_CONVERSION + CR0_OPEN_CIRCUIT_FAULT_TYPE_K /* + CR0_NOISE_FILTER_50HZ */)
 #define CR1_INIT  (CR1_AVERAGE_2_SAMPLES + CR1_THERMOCOUPLE_TYPE_K)
@@ -88,7 +90,7 @@ float getCurrentTemperature() {
 
   // Get the current readings
   for (uint8_t i=0; i<NUMBER_OF_OUTPUTS; i++) {
-    if (isHeatingElement(prefs.outputType[i]) && getOutput(i) == HIGH)
+    if (isHeatingElement(prefs.outputType[i]) && getOutput(i) == 1)
       outputValue[0]++;
   }
 
@@ -135,7 +137,7 @@ float getCurrentTemperature() {
 
 
 // Convert the temperature to a string
-char *getTemperatureString(char *str, float temperature, boolean displayInCelsius)
+char *getTemperatureString(char *str, float temperature, bool displayInCelsius)
 {
   if (!IS_MAX31856_ERROR(temperature)) {
     if (!displayInCelsius)

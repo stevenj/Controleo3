@@ -9,7 +9,7 @@
 #ifndef CONTROLEO3MAX31856_H
 #define CONTROLEO3MAX31856_H
 
-#include "Arduino.h"
+#include <stdint.h>
 
 // MAX31856 Registers
 // Register 0x00: CR0
@@ -84,15 +84,15 @@ class	Controleo3MAX31856
 {
 public:
     void begin(void);
-    void writeRegister(byte, byte);
-    double readThermocouple(byte unit);
-    double readJunction(byte unit);
+    void writeRegister(uint8_t registerNum, uint8_t data);
+    double readThermocouple(uint8_t unit);
+    double readJunction(uint8_t unit);
 
 private:
     long readData();
-    void writeByte(byte);
+    void writeByte(uint8_t);
     double verifyMAX31856();
-    byte _registers[NUM_REGISTERS];      // Shadow registers.  Registers can be restored if power to MAX31855 is lost
+    uint8_t _registers[NUM_REGISTERS];      // Shadow registers.  Registers can be restored if power to MAX31855 is lost
 };
 
 #endif  // CONTROLEO3MAX31856_H

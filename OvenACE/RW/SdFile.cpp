@@ -18,10 +18,11 @@
  * <http://www.gnu.org/licenses/>.
  */
 #include "SdFat.h"
-#ifdef __AVR__
-#include <avr/pgmspace.h>
-#endif
-#include <Arduino.h>
+#include <stdint.h>
+#include <string.h>
+#include "printf-stdarg.h"
+#include "ArduinoDefs.h"
+
 //------------------------------------------------------------------------------
 // callback function for date/time
 void (*SdFile::dateTime_)(uint16_t* date, uint16_t* time) = NULL;
@@ -215,7 +216,7 @@ void SdFile::ls(uint8_t flags, uint8_t indent) {
     if (!DIR_IS_FILE_OR_SUBDIR(p)) continue;
 
     // print any indent spaces
-    for (int8_t i = 0; i < indent; i++) Serial.print(' ');
+    for (int8_t i = 0; i < indent; i++) printfD(" ");
 
     // print file name with possible blank fill
     printDirName(*p, flags & (LS_DATE | LS_SIZE) ? 14 : 0);
@@ -223,15 +224,14 @@ void SdFile::ls(uint8_t flags, uint8_t indent) {
     // print modify date/time if requested
     if (flags & LS_DATE) {
        printFatDate(p->lastWriteDate);
-       Serial.print(' ');
+       printfD(" ");
        printFatTime(p->lastWriteTime);
     }
     // print size if requested
     if (!DIR_IS_SUBDIR(p) && (flags & LS_SIZE)) {
-      Serial.print(' ');
-      Serial.print(p->fileSize);
+      printfD(" %lu",p->fileSize);
     }
-    Serial.println();
+    printfD("\n");
 
     // list subdirectory content if requested
     if ((flags & LS_R) && DIR_IS_SUBDIR(p)) {
@@ -483,36 +483,36 @@ uint8_t SdFile::open(SdFile* dirFile, const char* fileName, uint8_t oflag) {
  */
 uint8_t SdFile::open(SdFile* dirFile, uint16_t index, uint8_t oflag) {
   // error if already open
-SerialUSB.println("SdFile::open:1");
+  printfD("SdFile::open:1\n");
 
   if (isOpen())return false;
-SerialUSB.println("SdFile::open:2");
+  printfD("SdFile::open:2\n");
 
   // don't open existing file if O_CREAT and O_EXCL - user call error
   if ((oflag & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL)) return false;
-SerialUSB.println("SdFile::open:3");
+  printfD("SdFile::open:3\n");
 
   vol_ = dirFile->vol_;
-SerialUSB.println("SdFile::open:4");
+  printfD("SdFile::open:4\n");
 
   // seek to location of entry
   if (!dirFile->seekSet(32 * index)) return false;
-SerialUSB.println("SdFile::open:5");
+  printfD("SdFile::open:5\n");
 
   // read entry into cache
   dir_t* p = dirFile->readDirCache();
-SerialUSB.println("SdFile::open:6");
+  printfD("SdFile::open:6\n");
   if (p == NULL) return false;
-SerialUSB.println("SdFile::open:7");
+  printfD("SdFile::open:7\n");
 
   // error if empty slot or '.' or '..'
   if (p->name[0] == DIR_NAME_FREE ||
       p->name[0] == DIR_NAME_DELETED || p->name[0] == '.') {
-SerialUSB.println("SdFile::open:8");
+  printfD("SdFile::open:8\n");
     return false;
   }
   // open cached entry
-SerialUSB.println("SdFile::open:9");
+  printfD("SdFile::open:9\n");
   return openCachedEntry(index & 0XF, oflag);
 }
 //------------------------------------------------------------------------------
@@ -605,18 +605,18 @@ void SdFile::printDirName(const dir_t& dir, uint8_t width) {
   for (uint8_t i = 0; i < 11; i++) {
     if (dir.name[i] == ' ')continue;
     if (i == 8) {
-      Serial.print('.');
+      printfD(".");
       w++;
     }
-    Serial.write(dir.name[i]);
+    printfD("%c",dir.name[i]);
     w++;
   }
   if (DIR_IS_SUBDIR(&dir)) {
-    Serial.print('/');
+    printfD("/");
     w++;
   }
   while (w < width) {
-    Serial.print(' ');
+    printfD(" ");
     w++;
   }
 }
@@ -628,10 +628,10 @@ void SdFile::printDirName(const dir_t& dir, uint8_t width) {
  * \param[in] fatDate The date field from a directory entry.
  */
 void SdFile::printFatDate(uint16_t fatDate) {
-  Serial.print(FAT_YEAR(fatDate));
-  Serial.print('-');
+  printfD("%d",FAT_YEAR(fatDate));
+  printfD("-");
   printTwoDigits(FAT_MONTH(fatDate));
-  Serial.print('-');
+  printfD("-");
   printTwoDigits(FAT_DAY(fatDate));
 }
 //------------------------------------------------------------------------------
@@ -643,9 +643,9 @@ void SdFile::printFatDate(uint16_t fatDate) {
  */
 void SdFile::printFatTime(uint16_t fatTime) {
   printTwoDigits(FAT_HOUR(fatTime));
-  Serial.print(':');
+  printfD(":");
   printTwoDigits(FAT_MINUTE(fatTime));
-  Serial.print(':');
+  printfD(":");
   printTwoDigits(FAT_SECOND(fatTime));
 }
 //------------------------------------------------------------------------------
@@ -658,7 +658,7 @@ void SdFile::printTwoDigits(uint8_t v) {
   str[0] = '0' + v/10;
   str[1] = '0' + v % 10;
   str[2] = 0;
-  Serial.print(str);
+  printfD(str);
 }
 //------------------------------------------------------------------------------
 /**
@@ -1255,7 +1255,7 @@ size_t SdFile::write(const char* str) {
 #ifdef __AVR__
 //------------------------------------------------------------------------------
 /**
- * Write a PROGMEM string to a file.
+ * Write a   string to a file.
  *
  * Use SdFile::writeError to check for errors.
  */
@@ -1264,7 +1264,7 @@ void SdFile::write_P(PGM_P str) {
 }
 //------------------------------------------------------------------------------
 /**
- * Write a PROGMEM string followed by CR/LF to a file.
+ * Write a   string followed by CR/LF to a file.
  *
  * Use SdFile::writeError to check for errors.
  */

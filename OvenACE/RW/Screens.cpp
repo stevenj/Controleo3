@@ -19,11 +19,13 @@
 #include "Controleo3MAX31856.h"
 #include "Temperature.h"
 #include "Learn.h"
+#include <stdio.h>
+#include "samd21.h"
 
 extern void setTouchCallback(void (*f) (), uint16_t interval);
-extern boolean drawTemperatureOnScreenNow;
+extern bool drawTemperatureOnScreenNow;
 
-void setTouchTemperatureUnitChangeCallback(void (*f) (boolean));
+void setTouchTemperatureUnitChangeCallback(void (*f) (bool));
 
 
 // This is the main loop, displaying one screen after the other as the user
@@ -32,7 +34,7 @@ void showScreen(uint8_t screen)
 { 
   profiles *p;
   uint8_t output = 0;
-  boolean onOff = 0;
+  bool onOff = 0;
 
   // This is the main loop, changing between the various screens.  Stay here forever ...
   while (1) {
@@ -665,7 +667,7 @@ redraw:
 }
 
 
-void drawTouchButton(uint16_t x, uint16_t y, uint16_t width, uint16_t textWidth, boolean useLargeFont, char *text) {
+void drawTouchButton(uint16_t x, uint16_t y, uint16_t width, uint16_t textWidth, bool useLargeFont, char *text) {
   drawButton(x, y, width, textWidth, useLargeFont, text);
   defineTouchArea(x, y, width, BUTTON_HEIGHT);
 }
@@ -673,7 +675,7 @@ void drawTouchButton(uint16_t x, uint16_t y, uint16_t width, uint16_t textWidth,
 
 // Draw the naviation buttons at the bottom of the screen
 // Use large tap targets if possible
-void drawNavigationButtons(boolean addRightArrow, boolean largeTargets)
+void drawNavigationButtons(bool addRightArrow, bool largeTargets)
 {
   uint16_t top, height;
   top = largeTargets? 239: 258;
@@ -697,7 +699,7 @@ void drawNavigationButtons(boolean addRightArrow, boolean largeTargets)
 
 
 // Display the screen title
-void displayHeader(char *text, boolean isSetting)
+void displayHeader(char *text, bool isSetting)
 {
   uint8_t offset = 10;
 
@@ -754,7 +756,7 @@ void drawIncreaseDecreaseTapTargets(uint8_t targetType)
 uint8_t testOutputType;
 
 // Used when user is testing their relays
-void drawTestOutputIcon(uint8_t type, boolean outputIsOn)
+void drawTestOutputIcon(uint8_t type, bool outputIsOn)
 {
   // Stop any touch callback used to animate icons
   setTouchIntervalCallback(0, 0);
