@@ -72,7 +72,9 @@ not need to be guarded with a critical section. */
 /* Architecture specifics. */
 #define portSTACK_GROWTH (-1)
 #define portTICK_PERIOD_MS ((TickType_t)1000 / configTICK_RATE_HZ)
-#define portBYTE_ALIGNMENT 8
+// NOTE: This Alignment WAS 8, but Cortex M0 only has Word Alignment issues.
+// At 8, we would get Asserts inside the Heap handler.
+#define portBYTE_ALIGNMENT 4
 /*-----------------------------------------------------------*/
 
 /* Scheduler utilities. */
