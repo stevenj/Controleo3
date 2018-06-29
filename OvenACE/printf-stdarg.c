@@ -27,6 +27,7 @@
 
 #include <stdarg.h>
 #include "usb_handler.h"
+#include "rtos_support.h"
 
 static char char_buf[1];
 
@@ -148,14 +149,14 @@ static int is_formatted(const char *format)
 
 static int print(char **out, const char *format, va_list args )
 {
-	register int width, pad;
+	register int width, pad, precision;
 	register int pc = 0;
 	char scr[2];
 
 	for (; *format != 0; ++format) {
 		if (*format == '%') {
 			++format;
-			width = pad = 0;
+			width = pad = precision = 0;
 			if (*format == '\0') break;
 			if (*format == '%') goto out;
 			if (*format == '-') {
@@ -170,6 +171,17 @@ static int print(char **out, const char *format, va_list args )
 				width *= 10;
 				width += *format - '0';
 			}
+			if( *format == '.' ) {
+				++format;
+				for ( ; *format >= '0' && *format <= '9'; ++format) {
+					precision *= 10;
+					precision += *format - '0';
+				}
+			}
+			if( *format == 'l' ) {
+				++format; // ignore length specifier.
+			}
+
 			if( *format == 's' ) {
 				register char *s = (char *)va_arg( args, int );
 				pc += prints (out, s?s:"(null)", width, pad);
@@ -177,6 +189,17 @@ static int print(char **out, const char *format, va_list args )
 			}
 			if( *format == 'd' ) {
 				pc += printi (out, va_arg( args, int ), 10, 1, width, pad, 'a');
+				continue;
+			}
+			if( *format == 'f' ) {
+				if (precision == 0) precision = 2; // Default precision.
+				double value = va_arg( args, double );
+				int intpart = (int)value;
+				int decpart = (int)((value - intpart) * POW10(precision));
+				pc += printi (out, intpart, 10, 1, width, pad, 'a');
+				printchar(out, '.');
+				pc++;
+				pc += printi (out, decpart, 10, 1, precision, PAD_ZERO, 'a');
 				continue;
 			}
 			if( *format == 'x' ) {
