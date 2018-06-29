@@ -150,11 +150,11 @@ void vPortStartFirstTask(void)
 	/* SJ: So instead I get the end of the stack from the link file, like a normal human does. */
 	__asm volatile(
 	    "	.syntax unified				\n"
-	    "	ldr  r2, pxCurrentTCBConst2	\n" /* Obtain location of pxCurrentTCB. */
 		/* SJ Stack Reset Changes Here: */
-		"   ldr  r0, [r2,4]             \n" /* Get MSP Stack Top */
-	    "	msr  msp, r0			    \n" /* Reset the IRQ stack back to the top.*/
+//		"   ldr  r0, pxStackTop         \n" /* Get MSP Stack Top */
+//	    "	msr  msp, r0			    \n" /* Reset the IRQ stack back to the top.*/
 		/* SJ Stack Reset Changes END Here: */
+	    "	ldr  r2, pxCurrentTCBConst2	\n" /* Obtain location of pxCurrentTCB. */
 	    "	ldr  r3, [r2]				\n"
 	    "	ldr  r0, [r3]				\n"     /* The first item in pxCurrentTCB is the task top of stack. */
 	    "	adds r0, #32					\n" /* Discard everything up to r0. */
