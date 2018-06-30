@@ -87,6 +87,7 @@ typedef volatile       uint8_t  RwReg8;  /**< Read-Write  8-bit register (volati
 /** \defgroup SAMD21J18A_cmsis CMSIS Definitions */
 /*@{*/
 
+#if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
 /** Interrupt Number Definition */
 typedef enum IRQn
 {
@@ -221,6 +222,8 @@ void DAC_Handler                 ( void );
 void PTC_Handler                 ( void );
 void I2S_Handler                 ( void );
 
+#endif
+
 /*
  * \brief Configuration of the Cortex-M0+ Processor and Core Peripherals
  */
@@ -231,6 +234,8 @@ void I2S_Handler                 ( void );
 #define __VTOR_PRESENT         1         /*!< VTOR present or not */
 #define __Vendor_SysTickConfig 0         /*!< Set to 1 if different SysTick Config is used */
 
+#if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
+
 /**
  * \brief CMSIS includes
  */
@@ -240,6 +245,7 @@ void I2S_Handler                 ( void );
 #include "system_samd21.h"
 #endif /* DONT_USE_CMSIS_INIT */
 
+#endif
 /*@}*/
 
 /* ************************************************************************** */
@@ -545,6 +551,7 @@ void I2S_Handler                 ( void );
 /*@{*/
 
 #include "pio/samd21j18a.h"
+
 /*@}*/
 
 /* ************************************************************************** */
