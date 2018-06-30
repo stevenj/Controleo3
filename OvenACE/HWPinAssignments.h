@@ -20,7 +20,7 @@ extern "C" {
 
 /* ********* CPU CYCLE TIMER ******************* */
 #define CPU_CYCLE_TC_MASTER 4
-#define CPU_CYCLE_TC_SLAVE  3
+#define CPU_CYCLE_TC_SLAVE  5
 #define CPU_CYCLE_TC_GCLK   0
 
 /* ********* DEBUG LEDS ******************* */
