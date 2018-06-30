@@ -64,10 +64,13 @@ extern "C" {
 #define SDCARD_CD         PA(2)
 #define SDCARD_MISO       PA(4)
 #define SDCARD_CLK        PA(5)
+#define SDCARD_SERCOM     0
+#define SDCARD_GCLK       0
+
 #if USE_HW_SPI
+    // We could use ALL hardware if we mod the board to swap MOSI/CS
     #define SDCARD_MOSI   PA(7)
     #define SDCARD_CS     PA(6)
-    #define SDCARD_SERCOM 0
 #else
     #define SDCARD_MOSI   PA(6)
     #define SDCARD_CS     PA(7)
