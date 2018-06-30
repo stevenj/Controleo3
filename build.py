@@ -141,8 +141,12 @@ BUILD={
                     "-x","assembler-with-cpp",
                     "-mcpu="+TARGET['CPU'],
                     "-mtune="+TARGET['CPU'],
+                    "-save-temps"
                 ],
             },
+            'DEFINES' : [
+                "__ASSEMBLY__",
+            ],
         }, # END GAS
 
         'LD' : {
@@ -256,7 +260,8 @@ BUILD={
 
             'SRC'     : [
             ] + util.all_files_in('OvenACE','.c',True)
-              + util.all_files_in('OvenACE','.cpp',True),
+#              + util.all_files_in('OvenACE','.cpp',True)
+              + util.all_files_in('OvenACE','.S',True),
             'INCLUDE' : [
             ] + util.all_directories_of('OvenACE','.h'),
 
