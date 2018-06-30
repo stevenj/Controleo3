@@ -14,10 +14,6 @@
 #include "stdio.h"
 #include "TaskDefs.h"
 
-#if 0
-#define DEBUGTASK_STACK_SIZE (128)
-#define DEBUGTASK_PRIORITY   (tskIDLE_PRIORITY + 1)
-#endif
 
 static TaskHandle_t      xDebugLedTask;
 
