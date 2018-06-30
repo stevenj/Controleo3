@@ -14,7 +14,7 @@ void hw_init(void)
 void subsystem_init(void)
 {
 	initDebugLeds();
-	//initPiezoBuzzer();
+	initPiezoBuzzer();
 }
 
 int main(void)

@@ -10,7 +10,7 @@
 extern "C" {
 #endif // __cplusplus
 
-#define HZ_TO_FREQ(hz) (GCLK3_HZ/hz)
+#define HZ_TO_FREQ(hz) (GCLK3_HZ/(hz*2))
 
 // Flash a particular debug led, a particular number of times.
 void PlayTone(uint16_t freq);
